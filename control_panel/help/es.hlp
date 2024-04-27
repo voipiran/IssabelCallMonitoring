@@ -1,0 +1,16 @@
+<html>
+    <header>
+        <link rel="stylesheet" href="/themes/{$THEMENAME}/styles.css">
+        <link rel="stylesheet" href="/themes/{$THEMENAME}/help.css">
+    </header>
+    <body>
+        <h1>{$node_name}</h1>
+        <p align="Justify">La opción "Panel del Operador" del menú "PBX" permite administrar las operaciones telefónicas. Se puede controlar las llamadas entrantes, llamadas salientes, el orden en que son atendidas las llamadas, el área designada para atender las llamadas, etc.</p>
+<p align="Justify">Este módulo es útil para recepcionistas quienes tienen una vista general de las colas, conferencias, parqueo de llamadas, extensiones internas, troncales, etc. Además por medio de este módulo es posible iniciar una llamada o transferir una llamada arrastrando una extensión hacia otra, o incluir varias extensiones a un cuarto de conferencia, una cola, etc. Es posible también ver las extensiones ocupadas, el tiempo transcurrido de una llamada y el caller ID.</p>
+
+        <!-- Form to add images -->
+        <div class="hlp_figures"><img src="../modules/{$node_id}/images/es_hlp_operator_panel.png" border="0" />
+	<p>Figura 1</p></div>
+	<p></p>
+    </body>
+</html>

@@ -1,0 +1,718 @@
+.pbxpanel {
+  padding: 5px;
+  width: auto;
+  height: auto;
+  border: 1px solid #707070; /* Color plomo para el contorno */
+  border-radius: 5px; /* Bordes redondeados para un aspecto elegante */
+  background-color: #cecece; /* Color de fondo si lo deseas */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra para dar profundidad */
+  list-style-type: none;
+  font-family: "Arial", sans-serif; /* Fuente elegante, puedes cambiarla si lo deseas */
+  color: #333; /* Color de texto */
+  font-size: 15px;
+}
+
+/* Puedes ajustar el tamaño de fuente según tus preferencias */
+.pbxpanel h1, .pbxpanel h2, .pbxpanel p {
+  font-size: 16px;
+}
+
+/* Estilo para los títulos y párrafos dentro del panel */
+.pbxpanel h1 {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.pbxpanel h2 {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 8px 0;
+}
+
+.pbxpanel p {
+  font-size: 16px;
+  margin: 6px 0;
+}
+
+.pbxelement {
+    display: inline-block;
+    width: 250px;
+    height: 55px;
+    border: 2px solid #000;
+    border-radius: 5px;
+    color: #000;
+    font-size: 12px;
+    position:relative;
+    background-color: #fdfffd;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    margin-top: 5px;
+    margin-right: 2px;
+}
+
+
+.pbxelement > div {
+	white-space: nowrap;
+}
+.pbxactive {
+    background-color: #b3f4ad;
+}
+
+.operator-title-container {
+  display: flex;
+  cursor: pointer;
+  margin-top: 0px;
+  border: solid 1px #000000;
+  padding: 4px 10px 4px 10px;
+  line-height: 1.6;
+  font-size: 13px;
+  z-index: 2;
+  background-color: #0f0f0f8c;
+  color: white;
+}
+
+.Extensions-List {
+    max-height: 705px;
+    overflow-y: auto;
+    scrollbar-width: thin; /* Ajusta el ancho de la barra de desplazamiento (thin, auto, o none) */
+    scrollbar-color: #223d71 #eee; /* Define el color de la barra y el color del fondo de la barra */
+    line-height: initial;
+}
+
+.Extensions-List::-webkit-scrollbar, .Queue-Container-Agent-Client::-webkit-scrollbar, .parkinglots-list::-webkit-scrollbar {
+    width: 5px; /* Ancho de la barra de desplazamiento en navegadores WebKit */
+}
+
+.Extensions-List::-webkit-scrollbar-thumb, .Queue-Container-Agent-Client::-webkit-scrollbar-thumb, .parkinglots-list::-webkit-scrollbar-thumb {
+    background-color: #223d71; /* Color del pulgar de la barra de desplazamiento en navegadores WebKit */
+}
+
+.parkinglots-list {
+    max-height: 205px;
+    overflow-y: auto; /* Esto permite el desplazamiento vertical si se excede la altura máxima */
+    scrollbar-width: thin; /* Ajusta el ancho de la barra de desplazamiento (thin, auto, o none) */
+    scrollbar-color: #223d71 #eee; /* Define el color de la barra y el color del fondo de la barra */
+
+}
+
+a.pbxtooltip {
+    /*position: relative;  es la posicion normal */
+    text-decoration: none ; /* forzar sin subrayado */
+}
+a.pbxtooltip > img.constantsize {
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: 0;
+}
+a.pbxtooltip > div {
+    display: none;
+    z-index: 6000;
+
+    position: absolute; /* se fuerza a que se ubique en un lugar de la pantalla */
+    top:1em; 
+    left:2em; /* donde va a estar */
+    min-width:160px; /* el ancho por defecto que va a tener */
+    min-height:30px;
+    padding:10px; /* la separacion entre el contenido y los bordes */
+    background-color: #6CF; /* el color de fondo por defecto */
+    border: 2px solid #36F;
+    
+    -moz-border-radius:6px;
+    -webkit-border-radius:6px;
+    border-radius:6px;
+    font-size:11px;
+    color: #000; /* el color de los textos por defecto */
+    
+    white-space: nowrap;
+}
+a.pbxtooltip:hover > div {
+    display: inline-block; /* se fuerza a mostrar el bloque */
+}
+a.pbxtooltip > div > ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 5px;
+}
+span.monitor {
+    color: blue;
+    font-size: 12px;
+}
+img.icon {
+    padding: 2px 2px 0 0;
+    border: 0;
+}
+dl.faq2 {
+    padding: 0px 0px 0px 0px;
+    /*float: left;
+    margin: 0px 1px 0 0px;
+    width: 380px;
+    height: auto;
+    z-index:-1;
+    */
+}
+span.paneledittitle {
+    float: right;
+    color: #3EBB40;
+    font-size: 11px;
+    margin-left: 60px;
+    cursor: pointer;
+}
+
+/*
+ul.lisortable {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    float: left;
+}
+
+
+*/
+
+div.statusbar {
+    width: 100%;
+}
+
+.QueueView-large {
+   width: 98%;
+   height: auto;
+   padding: 2px;
+}
+
+.Queue-Container-Agent-Client{
+  display: flex;
+  border-top: 1px solid #0f0f0f8c;
+  overflow: auto;
+  max-height: 150px;
+  scrollbar-width: thin; /* Ajusta el ancho de la barra de desplazamiento (thin, auto, o none) */
+  scrollbar-color: #223d71 #eee; /* Define el color de la barra y el color del fondo de la barra */
+}
+
+.ParkinglotView-large,
+.ConferenceView-large {
+   width: 45%;
+   min-height: 50px;
+   padding-left: 5px;
+   margin-right: 5px;
+}
+
+
+.containerAll {
+  border: 1px solid #707070; /* Color plomo para el contorno */
+  border-radius: 5px; /* Bordes redondeados para un aspecto elegante */
+  padding: 20px; /* Espacio interno para el contenido */
+  background-color: #f2f2f2; /* Color de fondo si lo deseas */
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Sombra para dar profundidad */
+  overflow: hidden; /* Clear float containers */
+
+}
+
+
+.left-container,
+.right-container {
+    transition: width 0.5s ease; /* Agrega una transición suave de 0.5 segundos con un efecto de suavizado (ease) */
+}
+
+.left-container {
+    float: left;
+    width: 69%; /* Ajusta el ancho según tus necesidades */
+    min-width: 550px;
+    padding-top: 13px;
+}
+
+.right-container {
+    float: right;
+    width: 30%; /* Ajusta el ancho según tus necesidades */
+    min-width: 470px;
+}
+
+/* Media query para pantallas más pequeñas (responsive) */
+@media only screen and (max-width: 1399px) {
+    .left-container, .right-container {
+        float: none;
+        width: 100%;
+    }
+}
+
+@media only screen and (min-width: 1400px) and (max-width: 1479px) {
+    .left-container {
+        width: 52%;
+    }
+
+    .right-container {
+        width: 35%;
+    }
+}
+
+@media only screen and (min-width: 1480px) and (max-width: 1599px) {
+    .left-container {
+        width: 57%;
+    }
+
+    .right-container {
+        width: 35%;
+    }
+}
+
+@media only screen and (min-width: 1600px) and (max-width: 1659px) {
+    .left-container {
+        width: 60%;
+    }
+
+    .right-container {
+        width: 30%;
+    }
+}
+
+@media only screen and (min-width: 1660px) and (max-width: 1749px) {
+    .left-container {
+        width: 63%;
+    }
+
+    .right-container {
+        width: 30%;
+    }
+}
+
+@media only screen and (min-width: 1750px) and (max-width: 1900px) {
+    .left-container {
+        width: 65%;
+    }
+
+    .right-container {
+        width: 30%;
+    }
+}
+
+.line-monitor{
+    width: 100%;
+    display: flex;
+    margin-top: 10px;
+}
+
+.phone-mail-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.phone-icon {
+  border: black solid 0px;
+}
+
+.mail-icon {
+  border: black solid 0px;
+}
+
+.utilities-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /*justify-content: space-between; /* Esto alinea los elementos a los extremos del contenedor */
+}
+
+#Acl {
+    width: 15%;
+    display: flex;
+    flex-wrap: wrap ;
+    padding: 10px;
+    justify-content: end;
+}
+
+.Extensions-Calls-Count {
+    width: 50%; /* 45% del ancho del contenedor principal */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.Registered,
+.NotRegistered {
+    width: 25%;
+    height: 80px;
+    flex-direction: column;
+    text-align: center;
+    border: 2px solid #c0c0c0; /* Borde sobrio en color gris */
+    margin: 5px; /* Separación entre contenedores de 10px */
+    padding: 5px; /* Margen dentro de los cuadros de 5px */
+    background-color: #f0f0f0; /* Color de fondo sobrio */
+    min-width: 150px;
+}
+
+.Registered span,
+.NotRegistered span {
+    font-size: 15px; /* Tamaño de fuente */
+    color: #333; /* Color de fuente */
+    font-weight: bold; /* Estilo de fuente en negrita */
+}
+
+.operator-button-container {
+    width: 40%; /* 50% del ancho del contenedor principal */
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap; /* Permitir que los elementos se envuelvan cuando no haya espacio suficiente */
+}
+
+.utility-button {
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: solid 2px #0010ff;
+    background-color: #eae9e9;
+}
+
+.utility-button:hover {
+    border: 2px solid blue;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    background-color: #3478f3;
+}
+
+.button-with-description {
+    width: 65px;
+    text-align: center;
+    margin-right: 5px;
+}
+
+/* Estilos para los contenedores de agentes */
+.agent-container {
+    display: flex;
+    align-items: center; /* Alinea verticalmente el contenido (círculo y nombre) al centro */
+    margin-right: 5px; /* Espacio entre el contenedor y el siguiente */
+    padding: 1px;
+}
+
+
+
+.circle {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%; /* Esto crea un círculo */
+    display: flex;
+    justify-content: center; /* Centra horizontalmente el contenido */
+    align-items: center; /* Centra verticalmente el contenido */
+    margin-right: 2px; /* Espacio entre el círculo y el texto */
+    border: 1px solid gray; /* Quitamos el borde */
+    text-align: center; /* Centra el símbolo '||' verticalmente en el círculo */
+}
+
+.green {
+    background-color: #4CAF50; /* Un verde más brillante */
+}
+
+.orange {
+    background-color: #F2A20EF7; /*naranja */
+}
+
+.orange-yellow {
+    background: linear-gradient(to right, #F2A20EF7 50%, #FFD700 50%);
+}
+
+.red {
+    background-color: #FF5733; /* Un rojo más brillante */
+}
+
+.strong-red {
+    background-color: red; /* Un rojo más brillante */
+}
+
+.yellow {
+    background-color: #FFD700; /* Un amarillo más brillante */
+}
+
+.gray {
+    background-color: gray; /* Un amarillo más brillante */
+}
+
+.notification-container {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.notification-message {
+    font-size: 16px;
+}
+
+
+.webPhoneContainer {
+    height: 100%;
+    width: 99%;
+    display: none;
+    border: 2px solid #000; /* Color plomo para el contorno */
+    border-radius: 5px; /* Bordes redondeados para un aspecto elegante */
+    background-color: #fdfffd;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    list-style-type: none;
+    font-family: "Arial", sans-serif; /* Fuente elegante, puedes cambiarla si lo deseas */
+    color: #333; /* Color de texto */
+}
+
+.webPhonePanel {
+  padding: 5px;
+  width: auto;
+  height: auto;
+  border: 1px solid #707070; /* Color plomo para el contorno */
+  border-radius: 5px; /* Bordes redondeados para un aspecto elegante */
+  background-color: #cecece; /* Color de fondo si lo deseas */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra para dar profundidad */
+  list-style-type: none;
+  font-family: "Arial", sans-serif; /* Fuente elegante, puedes cambiarla si lo deseas */
+  color: #333; /* Color de texto */
+  font-size: 15px;
+  height: 390px;
+}
+
+.webPhonePosition {
+    height: 350px;
+    width: 100%;
+
+}
+
+.webPhonePosition dt {
+    margin-top: 0px;
+    border: solid 1px #000000;
+    padding: 4px 10px 4px 10px;
+    line-height: 1.6;
+    font-size: 13px;
+    z-index: 2;
+    background-color: #0f0f0f8c;
+    color: white;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+
+
+
+
+.userAclModal {
+    height: 550px;
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;
+    position: absolute;
+    top: 20%;
+    left: 30%;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.closeButtonAcl {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+    color: #d9534f;
+    padding: 10px;
+    font-size: 18px;
+    transition: color 0.3s ease, background-color 0.3s ease; /* Agregamos transición para el color de texto y el color de fondo */
+}
+
+.closeButtonAcl:hover {
+    color: #c9302c; /* Cambia el color al pasar el ratón */
+    background-color: grey; /* Agrega un fondo celeste al pasar el ratón */
+}
+
+.aclInformationContainer {
+    display: flex;
+    flex-wrap: wrap;
+    /*padding-top: 50px;*/
+}
+
+.container-aclInformationDiv {
+    padding: 15px;
+    flex: 1;
+    min-width: 250px;
+}
+
+.title-container-acl {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 12px; /* Tamaño de fuente ajustable según tus preferencias */
+    font-weight: bold; /* Puedes ajustar la negrita según tus preferencias */
+    color: #333; /* Color del texto, puedes cambiarlo según tu paleta de colores */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* Sombra del texto para resaltar */
+    background-color: none;
+}
+
+
+.aclInformationDiv {
+    width: 100%;
+    height: 300px;
+    max-height: 300px;
+    overflow: auto;
+    border: 2px solid #ddd;
+    padding: 10px;
+    box-sizing: border-box;
+    background-color: #f9f9f9;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    transition: box-shadow 0.3s ease; /* Agregar transición en el hover */
+}
+
+.aclInformationDiv:hover {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* Cambiar la sombra en el hover */
+}
+
+.aclSelectBox {
+    display: block;
+    margin: auto;
+    min-width: 210px;
+    height: 40px;
+    margin-top: 20px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 5px;
+    transition: all 0.3s ease;
+}
+
+.aclSelectBox:hover {
+    border-color: #aaa;
+}
+
+.queueItem,
+.extensionItem {
+    padding: 5px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: background-color 0.2s ease; /* Agregamos una transición suave al color de fondo */
+    color: black;
+}
+
+.queueItem:hover,
+.extensionItem:hover {
+    background-color: #007BFF; /* Color azul cuando el mouse está encima */
+    color: #fff; /* Cambiamos el color del texto para mejorar la legibilidad */
+}
+
+.buttonsContainerAcl {
+    display: flex;
+    justify-content: center;
+    margin: 15px;
+
+}
+
+.buttonsContainerAcl button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    height: 40px;
+    width: 170px;
+}
+
+.buttonsContainerAcl button:hover {
+    background-color: #007BFF; /* Cambia el color de fondo al pasar el ratón */
+    color: #fff; /* Cambia el color del texto para mejorar la legibilidad */
+}
+
+.buttonsContainerAcl button:first-child {
+    background-color: #28a745; /* Color de fondo para el botón Create Usuario */
+    color: #fff;
+}
+
+.buttonsContainerAcl button:first-child:hover {
+    background-color: #218838;
+}
+
+.buttonsContainerAcl button:last-child {
+    background-color: #dc3545; /* Color de fondo para el botón Cancelar */
+    color: #fff;
+}
+
+.buttonsContainerAcl button:last-child:hover {
+    background-color: #bd2130;
+}
+
+.arrow-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.arrow-button {
+    font-size: 25px; /* Puedes ajustar el tamaño según tus preferencias */
+    background-color: transparent;
+    cursor: pointer;
+    margin: 10;
+    padding: 2px; /* Espaciado interno para el botón */
+    line-height: 100%;
+    border-radius: 5px;
+    min-width: 30px;
+    outline: none;
+    border: 1px solid transparent;
+}
+
+.arrow-button:hover {
+    background-color: #3478f3;
+    border: 1px solid transparent;
+}
+
+.arrow-button.right {
+    color: green;
+}
+
+.arrow-button.left {
+    color: red;
+}
+
+.checkboxContainerAcl {
+    color: black; 
+}
+
+.checkboxAclButtons {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 5px;
+    justify-content: center;
+}
+
+.checkboxAclAdminContainer {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 5px;
+    justify-content: center;
+}
+
+
+.checkboxWrapper input[type="checkbox"] {
+  display: none;
+  cursor: pointer;
+}
+
+.checkboxWrapper input[type="checkbox"] + label::before {
+  font-family: FontAwesome;
+  content: "\f096"; /* Este valor debe ser el ícono que desees para el checkbox no seleccionado */
+  width: 20px;
+  display: inline-block;
+  font-size: 18px;
+  vertical-align: middle;
+  line-height: 22px;
+  color: #3478f3; /* Color del ícono cuando no está seleccionado */
+  cursor: pointer;
+}
+
+.checkboxWrapper input[type="checkbox"]:checked + label::before {
+  content: "\f046"; /* Este valor debe ser el ícono que desees para el checkbox seleccionado */
+  color: #3478f3; /* Color del ícono cuando está seleccionado */
+  cursor: pointer;
+}
+
+.checkboxWrapper label{
+margin-right: 10px;
+cursor: pointer;
+}

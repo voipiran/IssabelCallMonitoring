@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+
+<module> 
+  <menulist> 
+
+	<menuitem menuid="control_panel" desc="Control Panel"
+	parent="pbxconfig" module="yes" link="" order="8"> 
+      <permissions> 
+        <group id="1" name="administrator" desc="total access"></group> 
+      </permissions> 
+    </menuitem>
+
+	
+  </menulist> 
+</module>

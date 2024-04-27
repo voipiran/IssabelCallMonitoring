@@ -1,0 +1,61 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+Codificación: UTF-8
++----------------------------------------------------------------------+
+| Issabel version 4.0                                                  |
+| http://www.issabel.org                                               |
++----------------------------------------------------------------------+
+| Copyright (c) 2021 Issabel Foundation                                |
+| Copyright (c) 2006 Palosanto Solutions S. A.                         |
++----------------------------------------------------------------------+
+| The contents of this file are subject to the General Public License  |
+| (GPL) Version 2 (the "License"); you may not use this file except in |
+| compliance with the License. You may obtain a copy of the License at |
+| http://www.opensource.org/licenses/gpl-license.php                   |
+|                                                                      |
+| Software distributed under the License is distributed on an "AS IS"  |
+| basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+| the License for the specific language governing rights and           |
+| limitations under the License.                                       |
++----------------------------------------------------------------------+
+| The Initial Developer of the Original Code is PaloSanto Solutions    |
++----------------------------------------------------------------------+
+$Id: br.lang,v 1.0 2017/07/19 19:45:00 Ibinetwork Informática - rafael@ibinetwork.com.br $ */
+global $arrLangModule;
+$arrLangModule=array(
+    
+"Control Panel" => "Painel Operador",
+"Name" => "Nome",
+"New" => "Novo",
+"Old" => "Antigo",
+"Participants" => "Participantes",
+"Participant" => "Participante",
+"Error when connecting to Asterisk Manager" => "Erro ao conectar ao Asterisk Manager",
+"Loading" => "Carregando",
+'Area 1' => 'Grupo 1',
+'Area 2' => 'Grupo 2',
+'Area 3' => 'Grupo 3',
+'Members' => 'Membros',
+'Not Attended' => 'Não Atendida',
+'Callers'   =>  'Chamadores',
+'No Callers' => 'Sem Chamadores',
+'Participant(s)' => 'Participante(s)',
+'Parked' => 'Espera',
+'Invalid or missing parameters' => 'Parametros inválidos ou inexistentes',
+'Hide All' => 'Ocultar',
+'Show All' => 'Exibir',
+'Edit Name' => 'Editar',
+'Extensions' => '<b>Ramais</b>',
+'DAHDI Trunks' => 'Placa-DAHDI',
+'SIP/IAX Trunks' => '<b>Linhas Externas</b>',
+'Conferences' => 'Conferencias',
+'Queues' => 'Fila Atendimento',
+'Parking lots' => 'Ligações Estacionadas',
+'Trunks' => 'Troncos',
+'TrunksSIP' => 'Troncos-SIP',
+'Half waiting time Queue' => 'Tempo de espera na fila',
+'Calls in Queue' => 'Chamadas na fila',
+'Reload' => 'Atualizar',
+'phones' => 'Ramais',
+);
+?>

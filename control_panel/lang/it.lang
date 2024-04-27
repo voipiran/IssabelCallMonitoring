@@ -1,0 +1,46 @@
+<?php
+  /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 1.6-3                                               |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+  | The Initial Developer of the Original Code is PaloSanto Solutions    |
+  |                                                                      |
+  | Translate by: Francesco Maria Taurino                                |
+  | Email: francesco.taurino@gmail.com                                   |
+  +----------------------------------------------------------------------+
+  $Id: en.lang,v 1.1 2009-06-08 03:06:39 Oscar Navarrete onavarrete@palosanto.com Exp $ */
+global $arrLangModule;
+$arrLangModule=array(
+"Control Panel" => "Panello operatore",
+"Name" => "Nome",
+"New" => "Nuovo",
+"Old" => "Vecchio",
+"Participants" => "Partecipanti",
+"Participant" => "Partecipante",
+"Error when connecting to Asterisk Manager" => "Errore durante la connessione ad Asterisk Manager",
+"Loading" => "Sto caricando",
+'Members' => 'Membri',
+'Not Attended' => 'Non presidiato',
+'Callers'   =>  'Chiamanti',
+'No Callers' => 'Non Chiamanti',
+'Participant(s)' => 'Partecipante(i)',
+'Parked' => 'Parcheggiata',
+'Invalid or missing parameters' => 'Parametri non validi o mancanti',
+'Hide All' => 'Nascondi Tutti',
+'Show All' => 'Mostra Tutti',
+);
+?>
