@@ -4,7 +4,7 @@ Issabel5 Free Call Monitoring Panel
 ## Installation
 Just Run This on your Linux CLI:
 ```
-curl -L -o callmonitoring.zip https://github.com/voipiran/IssabelCallMonitoring/archive/master.zip && unzip callmonitoring.zip && cd callmonitoring-main && chmod 777 install.sh && ./install.sh
+curl -L -o callmonitoring.zip https://github.com/voipiran/IssabelCallMonitoring/archive/master.zip && unzip callmonitoring.zip && cd IssabelCallMonitoring-main && chmod 755 install.sh && ./install.sh
 ```
 
 ## Give a Star! ⭐ یک ستاره با ما بدهید
