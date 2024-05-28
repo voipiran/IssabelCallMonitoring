@@ -82,6 +82,7 @@ function handleHTML_mainReport($smarty, $module_name, $local_templates_dir)
 
     //obtenemos la extension actual del usuario activo
     global $arrConf;
+    global $arrConfModule;	
 
 
     // Inicialización del estado del módulo
