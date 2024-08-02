@@ -215,6 +215,8 @@ class paloControlPanelStatus extends paloInterfaceSSE
     $user = $_SESSION['issabel_user'];
 
         // Recoger todas las extensiones, con todas las tecnologías
+		//VOIPIRAN
+		/*
         if ($user !== "admin") {
             $recordset = $this->_db->fetchTable(
             "SELECT devices.dial AS channel, devices.tech AS tech, devices.id AS extension, devices.description AS description
@@ -229,6 +231,10 @@ class paloControlPanelStatus extends paloInterfaceSSE
                 "SELECT dial AS channel, tech, id AS extension, description FROM devices ORDER BY CAST(extension AS SIGNED)",
                 TRUE);
         }
+		*/
+		        $recordset = $this->_db->fetchTable(
+                "SELECT dial AS channel, tech, id AS extension, description FROM devices ORDER BY CAST(extension AS SIGNED)",
+                TRUE);
 
         if (is_array($recordset)) foreach ($recordset as $tupla) {
         	$phonestate = array(
@@ -258,7 +264,8 @@ class paloControlPanelStatus extends paloInterfaceSSE
         }
         
         // Leer y clasificar todas las colas conocidas
-
+		//VOIPIRAN
+/*
         if ($user !== "admin") {
             $recordset = $this->_db->fetchTable(
             "SELECT queues_config.extension AS extension, queues_config.descr AS description
@@ -273,6 +280,10 @@ class paloControlPanelStatus extends paloInterfaceSSE
                 "SELECT extension, descr AS description FROM queues_config ORDER BY extension",
                 TRUE);
         }
+		*/
+		  $recordset = $this->_db->fetchTable(
+          "SELECT extension, descr AS description FROM queues_config ORDER BY extension",
+          TRUE);
 
         if (is_array($recordset)) foreach ($recordset as $tupla) {
         	$this->_internalState['queues'][$tupla['extension']] = array(

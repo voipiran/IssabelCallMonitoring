@@ -536,7 +536,7 @@
         <div class="Queue-Agents" style="width:60%;"> 
             </div>
         <div style="width:40%;">
-                <b>Clientes en cola:</b><span class="monitor"><b>{{callers.length}}</b></span><br/>
+                <b>Customers in Queue:</b><span class="monitor"><b>{{callers.length}}</b></span><br/>
                 {{#each callers}}<li><img src="modules/{/literal}{$module_name}{literal}/images/cliente.png" style="width: 15px; height: 15px;">{{CallerIDNum}}</li>{{/each}}
             {/literal}
         </div>
