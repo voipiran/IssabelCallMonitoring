@@ -337,7 +337,7 @@
         {literal}{{#view App.BaseSortableView }}{/literal}
 
         {* La lista de las troncales VoIP *}
-        <div style="width:50%; float:left"> 
+        <div style="width:100%; float:left"> 
         {literal}
             {{#view App.PBXPanelView controllerBinding="iptrunks" }}
                 <dt class="operator-title-container" id="operator-title-container";">
@@ -359,7 +359,7 @@
         </div>
 
         {* La lista de las troncales DAHDI *}
-        <div style="width:50%; float:left"> 
+        <div style="width:50%; float:left; display: none;">	
         {literal}
             {{#view App.PBXPanelView controllerBinding="dahdi" }}
             <dt class="operator-title-container" id="operator-title-container";">
