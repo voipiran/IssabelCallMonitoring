@@ -3,7 +3,7 @@
 <module> 
   <menulist> 
 
-	<menuitem menuid="control_panel" desc="Call Monitoring"
+	<menuitem menuid="control_panel" desc="پنل مونیتورینگ"
 	parent="pbxconfig" module="yes" link="" order="8"> 
       <permissions> 
         <group id="1" name="administrator" desc="total access"></group> 
