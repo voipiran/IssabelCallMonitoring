@@ -166,8 +166,6 @@ ul.lisortable {
     padding: 0;
     float: left;
 }
-
-
 */
 
 div.statusbar {
@@ -178,6 +176,8 @@ div.statusbar {
    width: 98%;
    height: auto;
    padding: 2px;
+   text-align: left; /* چپ‌چین کردن محتوای صف */
+   direction: ltr; /* جهت چپ به راست برای جلوگیری از به‌هم‌ریختگی */
 }
 
 .Queue-Container-Agent-Client{
@@ -187,6 +187,8 @@ div.statusbar {
   max-height: 150px;
   scrollbar-width: thin; /* Ajusta el ancho de la barra de desplazamiento (thin, auto, o none) */
   scrollbar-color: #223d71 #eee; /* Define el color de la barra y el color del fondo de la barra */
+  text-align: left; /* چپ‌چین کردن محتوای داخلی */
+  direction: ltr; /* جهت چپ به راست */
 }
 
 .ParkinglotView-large,
@@ -197,7 +199,6 @@ div.statusbar {
    margin-right: 5px;
 }
 
-
 .containerAll {
   border: 1px solid #707070; /* Color plomo para el contorno */
   border-radius: 5px; /* Bordes redondeados para un aspecto elegante */
@@ -205,9 +206,7 @@ div.statusbar {
   background-color: #f2f2f2; /* Color de fondo si lo deseas */
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Sombra para dar profundidad */
   overflow: hidden; /* Clear float containers */
-
 }
-
 
 .left-container,
 .right-container {
@@ -384,8 +383,6 @@ div.statusbar {
     padding: 1px;
 }
 
-
-
 .circle {
     width: 15px;
     height: 15px;
@@ -399,31 +396,31 @@ div.statusbar {
 }
 
 .green {
-    background-color: #4CAF50; /* Un verde más brillante */
+    background-color: #4CAF50; /* بهبود رنگ سبز برای جذاب‌تر شدن */
 }
 
 .orange {
-    background-color: #F2A20EF7; /*naranja */
+    background-color: #FF9800; /* بهبود رنگ نارنجی برای جذاب‌تر شدن */
 }
 
 .orange-yellow {
-    background: linear-gradient(to right, #F2A20EF7 50%, #FFD700 50%);
+    background: linear-gradient(to right, #FF9800 50%, #FFEB3B 50%);
 }
 
 .red {
-    background-color: #FF5733; /* Un rojo más brillante */
+    background-color: #F44336; /* بهبود رنگ قرمز برای جذاب‌تر شدن */
 }
 
 .strong-red {
-    background-color: red; /* Un rojo más brillante */
+    background-color: #D32F2F; /* بهبود رنگ قرمز قوی */
 }
 
 .yellow {
-    background-color: #FFD700; /* Un amarillo más brillante */
+    background-color: #FFEB3B; /* بهبود رنگ زرد */
 }
 
 .gray {
-    background-color: gray; /* Un amarillo más brillante */
+    background-color: #9E9E9E; /* بهبود رنگ خاکستری */
 }
 
 .notification-container {
@@ -442,7 +439,6 @@ div.statusbar {
 .notification-message {
     font-size: 16px;
 }
-
 
 .webPhoneContainer {
     height: 100%;
@@ -475,7 +471,6 @@ div.statusbar {
 .webPhonePosition {
     height: 350px;
     width: 100%;
-
 }
 
 .webPhonePosition dt {
@@ -490,10 +485,6 @@ div.statusbar {
     margin-bottom: 5px;
     cursor: pointer;
 }
-
-
-
-
 
 .userAclModal {
     height: 550px;
@@ -544,7 +535,6 @@ div.statusbar {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* Sombra del texto para resaltar */
     background-color: none;
 }
-
 
 .aclInformationDiv {
     width: 100%;
@@ -601,7 +591,6 @@ div.statusbar {
     display: flex;
     justify-content: center;
     margin: 15px;
-
 }
 
 .buttonsContainerAcl button {
@@ -687,7 +676,6 @@ div.statusbar {
     margin: 5px;
     justify-content: center;
 }
-
 
 .checkboxWrapper input[type="checkbox"] {
   display: none;
