@@ -42,7 +42,7 @@
             ">
                 <span style="font-size: 30px; color: #2e7d32; font-weight: 900;" class="Count-Registered"></span>
                 <span style="color: #2e7d32; font-size: 12px; white-space: nowrap;">
-                    در حال مکالمه
+                    آماده به کار
                 </span>
             </div>
 
@@ -63,7 +63,7 @@
             ">
                 <span style="font-size: 30px; color: #d32f2f; font-weight: 900;" class="Count-NotRegistered"></span>
                 <span style="color: #c62828; font-size: 12px; white-space: nowrap;">
-                    آماده
+                    غیر فعال
                 </span>
             </div>
 
