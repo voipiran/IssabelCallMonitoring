@@ -84,6 +84,31 @@ function handleHTML_mainReport($smarty, $module_name, $local_templates_dir)
     global $arrConf;
 
 
+
+$smarty->assign(array(
+        'title' => _tr('Control Panel'),
+        'LBL_EDIT_NAME' => _tr('Edit Name'),
+        'LBL_SAVE_NAME' => _tr('Save'),
+        'icon' => 'modules/'.$module_name.'/images/pbx_operator_panel.png',
+        'LBL_NEW' => _tr('New'),
+        'LBL_OLD' => _tr('Old'),
+        // ... بقیه خطوط قبلی ...
+
+        // ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
+        // فارسی‌سازی کامل عنوان بخش‌ها - نسخه ۱۰۰٪ بدون خطا
+        'TITLE_EXTENSIONS'      => 'داخلی‌ها',
+        'TITLE_QUEUES'          => 'صف‌ها',
+        'TITLE_CONFERENCES'     => 'کنفرانس‌ها',
+        'TITLE_PARKINGLOTS'     => 'پارکینگ تماس',
+        'TITLE_TRUNKS'          => 'ترانک‌های SIP/IAX',
+        'TITLE_CUSTOMERS_QUEUE' => 'مشتریان در صف:',
+        'TITLE_AGENTS'          => 'اپراتورها',
+        'TITLE_EDIT_NAME'       => 'ویرایش نام',
+        'TITLE_AREA_1'          => 'منطقه ۱',
+        'TITLE_AREA_2'          => 'منطقه ۲',
+        // ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
+    ));
+
     // Inicialización del estado del módulo
     paloServerSentEvents::generarEstadoHash($module_name, array());
     $pUtils = new paloControlPanelUtils();
@@ -381,5 +406,7 @@ function checkAreas() {
     // Devolver la respuesta en formato JSON
     //echo json_encode($response);
 }
+
+
 
 ?>

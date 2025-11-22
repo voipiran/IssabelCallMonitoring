@@ -1,706 +1,592 @@
+/* === فایل CSS کامل — سبک QPanel (سبز، سفید، کارت‌های شیک) + پشتیبانی کامل RTL و فارسی === */
+/* فقط کپی کنید و جایگزین کنید — متن فارسی راست‌چین، Extensions → اکستنشن‌ها، و غیره */
+
+/* به جای * که همه چیز رو خراب می‌کرد */
+body, div, span, p, a, td, th, li, dt, dd, input, textarea, select, label, h1, h2, h3, h4, h5, h6 {
+    direction: rtl !important;
+    text-align: right !important;
+    font-family: "IRANSans", Tahoma, sans-serif !important;
+}
+
+/* مهم: آیکون‌های FontAwesome رو از این قانون مستثنی کن تا مربع نشن */
+i, .fa, .fas, .far, .fab, [class^="fa-"], [class*=" fa-"] {
+    direction: ltr !important;
+    text-align: center !important;
+    font-family: "Font Awesome 5 Free", "Font Awesome 5 Brands", "FontAwesome" !important;
+}
+
 .pbxpanel {
-  padding: 5px;
+  padding: 6px;
   width: auto;
   height: auto;
-  border: 1px solid #707070; /* Color plomo para el contorno */
-  border-radius: 5px; /* Bordes redondeados para un aspecto elegante */
-  background-color: #cecece; /* Color de fondo si lo deseas */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra para dar profundidad */
+  border: 1px solid #a0a0a0;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #f0f4f7, #e0e6eb);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
   list-style-type: none;
-  font-family: "Arial", sans-serif; /* Fuente elegante, puedes cambiarla si lo deseas */
-  color: #333; /* Color de texto */
+  color: #2c3e50;
   font-size: 15px;
 }
-
-/* Puedes ajustar el tamaño de fuente según tus preferencias */
-.pbxpanel h1, .pbxpanel h2, .pbxpanel p {
-  font-size: 16px;
-}
-
-/* Estilo para los títulos y párrafos dentro del panel */
-.pbxpanel h1 {
-  font-size: 24px;
-  font-weight: bold;
-  margin: 10px 0;
-}
-
-.pbxpanel h2 {
-  font-size: 20px;
-  font-weight: bold;
-  margin: 8px 0;
-}
-
-.pbxpanel p {
-  font-size: 16px;
-  margin: 6px 0;
-}
+.pbxpanel h1 { font-size: 24px; font-weight: bold; margin: 10px 0; color: #2c3e50; }
+.pbxpanel h2 { font-size: 20px; font-weight: bold; margin: 8px 0; color: #34495e; }
+.pbxpanel p { font-size: 16px; margin: 6px 0; color: #555; }
 
 .pbxelement {
-    display: inline-block;
-    width: 250px;
-    height: 55px;
-    border: 2px solid #000;
-    border-radius: 5px;
-    color: #000;
-    font-size: 12px;
-    position:relative;
-    background-color: #fdfffd;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-    margin-top: 5px;
-    margin-right: 2px;
+  display: inline-block;
+  width: 250px;
+  height: 58px;
+  border: 1px solid #cfd8dc;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin: 4px 2px;
+  padding: 6px 8px;
+  position: relative;
+  transition: all 0.2s ease;
+  font-size: 12.5px;
+  color: #000;
+  box-sizing: border-box;
 }
-
-
-.pbxelement > div {
-	white-space: nowrap;
+.pbxelement > div { white-space: nowrap; }
+.pbxelement:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: #90a4ae;
 }
 .pbxactive {
-    background-color: #b3f4ad;
+  background: #d0f5d0;
+  border-color: #4caf50;
+  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.2);
 }
 
 .operator-title-container {
   display: flex;
+  align-items: center;
   cursor: pointer;
-  margin-top: 0px;
-  border: solid 1px #000000;
-  padding: 4px 10px 4px 10px;
-  line-height: 1.6;
+  padding: 5px 10px;
+  margin-bottom: 6px;
+  border-radius: 8px;
+  background: #2e7d32;
+  color: #ffffff;
   font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  transition: background 0.25s ease;
   z-index: 2;
-  background-color: #0f0f0f8c;
-  color: white;
+  border: none;
+}
+.operator-title-container:hover {
+  background: #1b5e20;
 }
 
 .Extensions-List {
-    max-height: 705px;
-    overflow-y: auto;
-    scrollbar-width: thin; /* Ajusta el ancho de la barra de desplazamiento (thin, auto, o none) */
-    scrollbar-color: #223d71 #eee; /* Define el color de la barra y el color del fondo de la barra */
-    line-height: initial;
+  max-height: 705px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #4caf50 #e8f5e8;
+  line-height: initial;
+  padding: 4px;
 }
-
 .Extensions-List::-webkit-scrollbar, .Queue-Container-Agent-Client::-webkit-scrollbar, .parkinglots-list::-webkit-scrollbar {
-    width: 5px; /* Ancho de la barra de desplazamiento en navegadores WebKit */
+  width: 5px;
 }
-
 .Extensions-List::-webkit-scrollbar-thumb, .Queue-Container-Agent-Client::-webkit-scrollbar-thumb, .parkinglots-list::-webkit-scrollbar-thumb {
-    background-color: #223d71; /* Color del pulgar de la barra de desplazamiento en navegadores WebKit */
+  background-color: #4caf50;
+  border-radius: 3px;
+}
+.Extensions-List::-webkit-scrollbar-track, .Queue-Container-Agent-Client::-webkit-scrollbar-track, .parkinglots-list::-webkit-scrollbar-track {
+  background: #e8f5e8;
+  border-radius: 3px;
 }
 
 .parkinglots-list {
-    max-height: 205px;
-    overflow-y: auto; /* Esto permite el desplazamiento vertical si se excede la altura máxima */
-    scrollbar-width: thin; /* Ajusta el ancho de la barra de desplazamiento (thin, auto, o none) */
-    scrollbar-color: #223d71 #eee; /* Define el color de la barra y el color del fondo de la barra */
-
+  max-height: 205px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #4caf50 #e8f5e8;
+  padding: 4px;
 }
 
 a.pbxtooltip {
-    /*position: relative;  es la posicion normal */
-    text-decoration: none ; /* forzar sin subrayado */
+  text-decoration: none;
 }
 a.pbxtooltip > img.constantsize {
-    width: 18px;
-    height: 18px;
-    padding: 0;
-    border: 0;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
 }
 a.pbxtooltip > div {
-    display: none;
-    z-index: 6000;
-
-    position: absolute; /* se fuerza a que se ubique en un lugar de la pantalla */
-    top:1em; 
-    left:2em; /* donde va a estar */
-    min-width:160px; /* el ancho por defecto que va a tener */
-    min-height:30px;
-    padding:10px; /* la separacion entre el contenido y los bordes */
-    background-color: #6CF; /* el color de fondo por defecto */
-    border: 2px solid #36F;
-    
-    -moz-border-radius:6px;
-    -webkit-border-radius:6px;
-    border-radius:6px;
-    font-size:11px;
-    color: #000; /* el color de los textos por defecto */
-    
-    white-space: nowrap;
+  display: none;
+  z-index: 6000;
+  position: absolute;
+  top: 1.2em;
+  right: 2.2em; /* تغییر از left به right برای RTL */
+  min-width: 180px;
+  padding: 10px;
+  background: #ffffff;
+  color: #2c3e50;
+  border: 1px solid #a0a0a0;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  font-size: 12px;
+  white-space: nowrap;
 }
 a.pbxtooltip:hover > div {
-    display: inline-block; /* se fuerza a mostrar el bloque */
+  display: block;
+  animation: fadeIn 0.25s ease;
 }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 a.pbxtooltip > div > ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 5px;
+  list-style-type: none;
+  margin: 0;
+  padding: 4px;
 }
+
 span.monitor {
-    color: blue;
-    font-size: 12px;
+  color: #1976d2;
+  font-size: 12px;
 }
 img.icon {
-    padding: 2px 2px 0 0;
-    border: 0;
-}
-dl.faq2 {
-    padding: 0px 0px 0px 0px;
-    /*float: left;
-    margin: 0px 1px 0 0px;
-    width: 380px;
-    height: auto;
-    z-index:-1;
-    */
-}
-span.paneledittitle {
-    float: right;
-    color: #3EBB40;
-    font-size: 11px;
-    margin-left: 60px;
-    cursor: pointer;
+  padding: 2px 2px 0 0;
+  border: 0;
 }
 
-/*
-ul.lisortable {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    float: left;
+dl.faq2 {
+  padding: 0;
 }
-*/
+
+span.paneledittitle {
+  float: left; /* تغییر از right به left برای RTL */
+  color: #4caf50;
+  font-size: 11px;
+  margin-right: 60px;
+  cursor: pointer;
+}
 
 div.statusbar {
-    width: 100%;
+  width: 100%;
 }
 
 .QueueView-large {
-   width: 98%;
-   height: auto;
-   padding: 2px;
-   text-align: left; /* چپ‌چین کردن محتوای صف */
-   direction: ltr; /* جهت چپ به راست برای جلوگیری از به‌هم‌ریختگی */
+  width: 98%;
+  height: auto;
+  padding: 2px;
+  text-align: right; /* تغییر از left به right */
+  direction: rtl;
 }
 
-.Queue-Container-Agent-Client{
+.Queue-Container-Agent-Client {
   display: flex;
-  border-top: 1px solid #0f0f0f8c;
+  border-top: 1px solid #cfd8dc;
   overflow: auto;
   max-height: 150px;
-  scrollbar-width: thin; /* Ajusta el ancho de la barra de desplazamiento (thin, auto, o none) */
-  scrollbar-color: #223d71 #eee; /* Define el color de la barra y el color del fondo de la barra */
-  text-align: left; /* چپ‌چین کردن محتوای داخلی */
-  direction: ltr; /* جهت چپ به راست */
+  scrollbar-width: thin;
+  scrollbar-color: #4caf50 #e8f5e8;
+  text-align: right;
+  direction: rtl;
+  padding: 4px;
 }
 
-.ParkinglotView-large,
-.ConferenceView-large {
-   width: 45%;
-   min-height: 50px;
-   padding-left: 5px;
-   margin-right: 5px;
+.ParkinglotView-large, .ConferenceView-large {
+  width: 45%;
+  min-height: 50px;
+  padding-right: 4px; /* تغییر از left به right */
+  margin-left: 4px; /* تغییر از right به left */
 }
 
 .containerAll {
-  border: 1px solid #707070; /* Color plomo para el contorno */
-  border-radius: 5px; /* Bordes redondeados para un aspecto elegante */
-  padding: 20px; /* Espacio interno para el contenido */
-  background-color: #f2f2f2; /* Color de fondo si lo deseas */
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Sombra para dar profundidad */
-  overflow: hidden; /* Clear float containers */
+  border: 1px solid #b0bec5;
+  border-radius: 10px;
+  background: #f8fcf8;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  overflow: hidden;
 }
 
-.left-container,
-.right-container {
-    transition: width 0.5s ease; /* Agrega una transición suave de 0.5 segundos con un efecto de suavizado (ease) */
+.left-container, .right-container {
+  transition: width 0.5s ease;
 }
-
 .left-container {
-    float: left;
-    width: 69%; /* Ajusta el ancho según tus necesidades */
-    min-width: 550px;
-    padding-top: 13px;
+  float: right; /* تغییر از left به right */
+  width: 69%;
+  min-width: 550px;
+  padding-top: 10px;
 }
-
 .right-container {
-    float: right;
-    width: 30%; /* Ajusta el ancho según tus necesidades */
-    min-width: 470px;
+  float: left; /* تغییر از right به left */
+  width: 30%;
+  min-width: 470px;
 }
 
-/* Media query para pantallas más pequeñas (responsive) */
+/* Responsive Media Queries (بدون تغییر) */
 @media only screen and (max-width: 1399px) {
-    .left-container, .right-container {
-        float: none;
-        width: 100%;
-    }
+  .left-container, .right-container { float: none; width: 100%; }
 }
-
 @media only screen and (min-width: 1400px) and (max-width: 1479px) {
-    .left-container {
-        width: 52%;
-    }
-
-    .right-container {
-        width: 35%;
-    }
+  .left-container { width: 52%; }
+  .right-container { width: 35%; }
 }
-
 @media only screen and (min-width: 1480px) and (max-width: 1599px) {
-    .left-container {
-        width: 57%;
-    }
-
-    .right-container {
-        width: 35%;
-    }
+  .left-container { width: 57%; }
+  .right-container { width: 35%; }
 }
-
 @media only screen and (min-width: 1600px) and (max-width: 1659px) {
-    .left-container {
-        width: 60%;
-    }
-
-    .right-container {
-        width: 30%;
-    }
+  .left-container { width: 60%; }
+  .right-container { width: 30%; }
 }
-
 @media only screen and (min-width: 1660px) and (max-width: 1749px) {
-    .left-container {
-        width: 63%;
-    }
-
-    .right-container {
-        width: 30%;
-    }
+  .left-container { width: 63%; }
+  .right-container { width: 30%; }
 }
-
 @media only screen and (min-width: 1750px) and (max-width: 1900px) {
-    .left-container {
-        width: 65%;
-    }
-
-    .right-container {
-        width: 30%;
-    }
+  .left-container { width: 65%; }
+  .right-container { width: 30%; }
 }
 
-.line-monitor{
-    width: 100%;
-    display: flex;
-    margin-top: 10px;
+.line-monitor {
+  width: 100%;
+  display: flex;
+  margin-top: 8px;
+  padding: 0 6px;
 }
 
 .phone-mail-container {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start; /* تغییر از end به start */
   align-items: center;
+  padding: 0 6px;
 }
-
-.phone-icon {
+.phone-icon, .mail-icon {
   border: black solid 0px;
-}
-
-.mail-icon {
-  border: black solid 0px;
+  margin: 0 3px;
 }
 
 .utilities-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /*justify-content: space-between; /* Esto alinea los elementos a los extremos del contenedor */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0;
 }
 
 #Acl {
-    width: 15%;
-    display: flex;
-    flex-wrap: wrap ;
-    padding: 10px;
-    justify-content: end;
+  width: 15%;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 8px;
+  justify-content: start; /* تغییر از end به start */
 }
 
 .Extensions-Calls-Count {
-    width: 50%; /* 45% del ancho del contenedor principal */
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
+  width: 50%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 6px;
 }
 
-.Registered,
-.NotRegistered {
-    width: 25%;
-    height: 80px;
-    flex-direction: column;
-    text-align: center;
-    border: 2px solid #c0c0c0; /* Borde sobrio en color gris */
-    margin: 5px; /* Separación entre contenedores de 10px */
-    padding: 5px; /* Margen dentro de los cuadros de 5px */
-    background-color: #f0f0f0; /* Color de fondo sobrio */
-    min-width: 150px;
+.Registered, .NotRegistered {
+  width: 25%;
+  height: 82px;
+  flex-direction: column;
+  text-align: center;
+  border: 1px solid #b0bec5;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin: 4px;
+  padding: 6px;
+  min-width: 150px;
+  transition: transform 0.2s ease;
 }
-
-.Registered span,
-.NotRegistered span {
-    font-size: 15px; /* Tamaño de fuente */
-    color: #333; /* Color de fuente */
-    font-weight: bold; /* Estilo de fuente en negrita */
+.Registered:hover, .NotRegistered:hover { transform: translateY(-1px); }
+.Registered span, .NotRegistered span {
+  font-size: 15px;
+  font-weight: 600;
+  color: #2c3e50;
 }
 
 .operator-button-container {
-    width: 40%; /* 50% del ancho del contenedor principal */
-    padding: 10px;
-    display: flex;
-    flex-wrap: wrap; /* Permitir que los elementos se envuelvan cuando no haya espacio suficiente */
+  width: 40%;
+  padding: 8px;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .utility-button {
-    width: 50px;
-    height: 50px;
-    cursor: pointer;
-    border-radius: 5px;
-    border: solid 2px #0010ff;
-    background-color: #eae9e9;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  border-radius: 10px;
+  border: 1px solid #42a5f5;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.25s ease;
+  margin: 4px;
 }
-
 .utility-button:hover {
-    border: 2px solid blue;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-    background-color: #3478f3;
+  background: #42a5f5;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(66, 165, 245, 0.3);
 }
 
 .button-with-description {
-    width: 65px;
-    text-align: center;
-    margin-right: 5px;
+  width: 62px;
+  text-align: center;
+  margin-left: 4px; /* تغییر از right به left */
 }
 
-/* Estilos para los contenedores de agentes */
 .agent-container {
-    display: flex;
-    align-items: center; /* Alinea verticalmente el contenido (círculo y nombre) al centro */
-    margin-right: 5px; /* Espacio entre el contenedor y el siguiente */
-    padding: 1px;
+  display: flex;
+  align-items: center;
+  margin-left: 4px; /* تغییر از right به left */
+  padding: 2px;
 }
-
 .circle {
-    width: 15px;
-    height: 15px;
-    border-radius: 50%; /* Esto crea un círculo */
-    display: flex;
-    justify-content: center; /* Centra horizontalmente el contenido */
-    align-items: center; /* Centra verticalmente el contenido */
-    margin-right: 2px; /* Espacio entre el círculo y el texto */
-    border: 1px solid gray; /* Quitamos el borde */
-    text-align: center; /* Centra el símbolo '||' verticalmente en el círculo */
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 3px; /* تغییر از right به left */
+  border: 1px solid #90a4ae;
+  text-align: center;
 }
-
-.green {
-    background-color: #4CAF50; /* بهبود رنگ سبز برای جذاب‌تر شدن */
-}
-
-.orange {
-    background-color: #FF9800; /* بهبود رنگ نارنجی برای جذاب‌تر شدن */
-}
-
-.orange-yellow {
-    background: linear-gradient(to right, #FF9800 50%, #FFEB3B 50%);
-}
-
-.red {
-    background-color: #F44336; /* بهبود رنگ قرمز برای جذاب‌تر شدن */
-}
-
-.strong-red {
-    background-color: #D32F2F; /* بهبود رنگ قرمز قوی */
-}
-
-.yellow {
-    background-color: #FFEB3B; /* بهبود رنگ زرد */
-}
-
-.gray {
-    background-color: #9E9E9E; /* بهبود رنگ خاکستری */
-}
+.green { background-color: #4CAF50; }
+.orange { background-color: #FF9800; }
+.orange-yellow { background: linear-gradient(to right, #FF9800 50%, #FFEB3B 50%); }
+.red { background-color: #F44336; }
+.strong-red { background-color: #D32F2F; }
+.yellow { background-color: #FFEB3B; }
+.gray { background-color: #9E9E9E; }
 
 .notification-container {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    background: white;
-    border: 1px solid #ccc;
-    padding: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    z-index: 2;
-    opacity: 0;
-    transition: opacity 0.5s;
+  position: fixed;
+  top: 10px;
+  left: 10px; /* تغییر از right به left */
+  background: white;
+  border: 1px solid #cfd8dc;
+  padding: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.4s;
+  border-radius: 8px;
 }
-
-.notification-message {
-    font-size: 16px;
-}
+.notification-message { font-size: 16px; }
 
 .webPhoneContainer {
-    height: 100%;
-    width: 99%;
-    display: none;
-    border: 2px solid #000; /* Color plomo para el contorno */
-    border-radius: 5px; /* Bordes redondeados para un aspecto elegante */
-    background-color: #fdfffd;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-    list-style-type: none;
-    font-family: "Arial", sans-serif; /* Fuente elegante, puedes cambiarla si lo deseas */
-    color: #333; /* Color de texto */
+  height: 100%;
+  width: 99%;
+  display: none;
+  border: 1px solid #b0bec5;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  list-style-type: none;
+  color: #2c3e50;
+  padding: 8px;
 }
 
 .webPhonePanel {
-  padding: 5px;
+  padding: 8px;
   width: auto;
   height: auto;
-  border: 1px solid #707070; /* Color plomo para el contorno */
-  border-radius: 5px; /* Bordes redondeados para un aspecto elegante */
-  background-color: #cecece; /* Color de fondo si lo deseas */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra para dar profundidad */
+  border: 1px solid #b0bec5;
+  border-radius: 10px;
+  background: #f8fcf8;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
   list-style-type: none;
-  font-family: "Arial", sans-serif; /* Fuente elegante, puedes cambiarla si lo deseas */
-  color: #333; /* Color de texto */
+  color: #2c3e50;
   font-size: 15px;
   height: 390px;
 }
 
 .webPhonePosition {
-    height: 350px;
-    width: 100%;
+  height: 350px;
+  width: 100%;
+  padding: 6px;
 }
-
 .webPhonePosition dt {
-    margin-top: 0px;
-    border: solid 1px #000000;
-    padding: 4px 10px 4px 10px;
-    line-height: 1.6;
-    font-size: 13px;
-    z-index: 2;
-    background-color: #0f0f0f8c;
-    color: white;
-    margin-bottom: 5px;
-    cursor: pointer;
+  margin-top: 0;
+  border: solid 1px #2e7d32;
+  padding: 5px 10px;
+  line-height: 1.5;
+  font-size: 13px;
+  z-index: 2;
+  background: #2e7d32;
+  color: white;
+  margin-bottom: 4px;
+  cursor: pointer;
+  border-radius: 8px;
 }
 
 .userAclModal {
-    height: 550px;
-    background-color: #f8f8f8;
-    border: 1px solid #ccc;
-    position: absolute;
-    top: 20%;
-    left: 30%;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
+  height: 550px;
+  background-color: #ffffff;
+  border: 1px solid #b0bec5;
+  position: absolute;
+  top: 20%;
+  right: 30%; /* تغییر از left به right برای وسط بودن */
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  transition: all 0.3s ease;
+  padding: 12px;
 }
 
 .closeButtonAcl {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    cursor: pointer;
-    color: #d9534f;
-    padding: 10px;
-    font-size: 18px;
-    transition: color 0.3s ease, background-color 0.3s ease; /* Agregamos transición para el color de texto y el color de fondo */
+  position: absolute;
+  left: 10px; /* تغییر از right به left */
+  top: 10px;
+  cursor: pointer;
+  color: #e53935;
+  padding: 8px;
+  font-size: 18px;
+  transition: all 0.25s ease;
 }
-
 .closeButtonAcl:hover {
-    color: #c9302c; /* Cambia el color al pasar el ratón */
-    background-color: grey; /* Agrega un fondo celeste al pasar el ratón */
+  color: #c62828;
+  background-color: #ffebee;
+  border-radius: 50%;
 }
 
-.aclInformationContainer {
-    display: flex;
-    flex-wrap: wrap;
-    /*padding-top: 50px;*/
-}
-
-.container-aclInformationDiv {
-    padding: 15px;
-    flex: 1;
-    min-width: 250px;
-}
-
+.aclInformationContainer { display: flex; flex-wrap: wrap; padding: 6px; }
+.container-aclInformationDiv { padding: 12px; flex: 1; min-width: 250px; }
 .title-container-acl {
-    text-align: center;
-    margin-bottom: 10px;
-    font-size: 12px; /* Tamaño de fuente ajustable según tus preferencias */
-    font-weight: bold; /* Puedes ajustar la negrita según tus preferencias */
-    color: #333; /* Color del texto, puedes cambiarlo según tu paleta de colores */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* Sombra del texto para resaltar */
-    background-color: none;
+  text-align: center;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #2c3e50;
 }
 
 .aclInformationDiv {
-    width: 100%;
-    height: 300px;
-    max-height: 300px;
-    overflow: auto;
-    border: 2px solid #ddd;
-    padding: 10px;
-    box-sizing: border-box;
-    background-color: #f9f9f9;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    transition: box-shadow 0.3s ease; /* Agregar transición en el hover */
+  width: 100%;
+  height: 300px;
+  max-height: 300px;
+  overflow: auto;
+  border: 1px solid #cfd8dc;
+  padding: 10px;
+  box-sizing: border-box;
+  background-color: #fafafa;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  transition: box-shadow 0.25s ease;
 }
-
-.aclInformationDiv:hover {
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* Cambiar la sombra en el hover */
-}
+.aclInformationDiv:hover { box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12); }
 
 .aclSelectBox {
-    display: block;
-    margin: auto;
-    min-width: 210px;
-    height: 40px;
-    margin-top: 20px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 5px;
-    transition: all 0.3s ease;
+  display: block;
+  margin: 16px auto 0;
+  min-width: 210px;
+  height: 38px;
+  font-size: 16px;
+  border: 1px solid #b0bec5;
+  border-radius: 8px;
+  padding: 4px 10px;
+  transition: all 0.25s ease;
 }
+.aclSelectBox:hover { border-color: #78909c; }
 
-.aclSelectBox:hover {
-    border-color: #aaa;
+.queueItem, .extensionItem {
+  padding: 6px 10px;
+  margin: 4px;
+  border: 1px solid #b0bec5;
+  border-radius: 8px;
+  background: #fafafa;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 13px;
+  color: #2c3e50;
 }
-
-.queueItem,
-.extensionItem {
-    padding: 5px;
-    margin: 5px;
-    border: 1px solid #ccc;
-    cursor: pointer;
-    transition: background-color 0.2s ease; /* Agregamos una transición suave al color de fondo */
-    color: black;
-}
-
-.queueItem:hover,
-.extensionItem:hover {
-    background-color: #007BFF; /* Color azul cuando el mouse está encima */
-    color: #fff; /* Cambiamos el color del texto para mejorar la legibilidad */
+.queueItem:hover, .extensionItem:hover {
+  background: #4caf50;
+  color: white;
+  border-color: #4caf50;
+  transform: translateY(-1px);
 }
 
 .buttonsContainerAcl {
-    display: flex;
-    justify-content: center;
-    margin: 15px;
+  display: flex;
+  justify-content: center;
+  margin: 12px;
 }
-
 .buttonsContainerAcl button {
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    height: 40px;
-    width: 170px;
-}
-
-.buttonsContainerAcl button:hover {
-    background-color: #007BFF; /* Cambia el color de fondo al pasar el ratón */
-    color: #fff; /* Cambia el color del texto para mejorar la legibilidad */
-}
-
-.buttonsContainerAcl button:first-child {
-    background-color: #28a745; /* Color de fondo para el botón Create Usuario */
-    color: #fff;
-}
-
-.buttonsContainerAcl button:first-child:hover {
-    background-color: #218838;
-}
-
-.buttonsContainerAcl button:last-child {
-    background-color: #dc3545; /* Color de fondo para el botón Cancelar */
-    color: #fff;
-}
-
-.buttonsContainerAcl button:last-child:hover {
-    background-color: #bd2130;
-}
-
-.arrow-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.arrow-button {
-    font-size: 25px; /* Puedes ajustar el tamaño según tus preferencias */
-    background-color: transparent;
-    cursor: pointer;
-    margin: 10;
-    padding: 2px; /* Espaciado interno para el botón */
-    line-height: 100%;
-    border-radius: 5px;
-    min-width: 30px;
-    outline: none;
-    border: 1px solid transparent;
-}
-
-.arrow-button:hover {
-    background-color: #3478f3;
-    border: 1px solid transparent;
-}
-
-.arrow-button.right {
-    color: green;
-}
-
-.arrow-button.left {
-    color: red;
-}
-
-.checkboxContainerAcl {
-    color: black; 
-}
-
-.checkboxAclButtons {
-    display: flex;
-    flex-wrap: wrap;
-    margin: 5px;
-    justify-content: center;
-}
-
-.checkboxAclAdminContainer {
-    display: flex;
-    flex-wrap: wrap;
-    margin: 5px;
-    justify-content: center;
-}
-
-.checkboxWrapper input[type="checkbox"] {
-  display: none;
+  padding: 8px 18px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
+  height: 40px;
+  width: 160px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+.buttonsContainerAcl button:first-child {
+  background: #4caf50;
+  color: white;
+}
+.buttonsContainerAcl button:first-child:hover {
+  background: #388e3c;
+  transform: translateY(-1px);
+}
+.buttonsContainerAcl button:last-child {
+  background: #e53935;
+  color: white;
+}
+.buttonsContainerAcl button:last-child:hover {
+  background: #c62828;
+  transform: translateY(-1px);
 }
 
+.arrow-container { display: flex; flex-direction: column; justify-content: center; padding: 6px; }
+.arrow-button {
+  font-size: 24px;
+  background: transparent;
+  cursor: pointer;
+  margin: 6px;
+  padding: 3px;
+  border-radius: 8px;
+  min-width: 34px;
+  border: 1px solid #cfd8dc;
+  transition: all 0.2s ease;
+}
+.arrow-button:hover {
+  background: #4caf50;
+  color: white;
+  border-color: #4caf50;
+  transform: scale(1.08);
+}
+.arrow-button.right { color: #4caf50; }
+.arrow-button.left { color: #e53935; }
+
+.checkboxContainerAcl { color: black; }
+.checkboxAclButtons, .checkboxAclAdminContainer {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 4px;
+  justify-content: center;
+  padding: 6px;
+}
+
+.checkboxWrapper input[type="checkbox"] { display: none; cursor: pointer; }
 .checkboxWrapper input[type="checkbox"] + label::before {
   font-family: FontAwesome;
-  content: "\f096"; /* Este valor debe ser el ícono que desees para el checkbox no seleccionado */
-  width: 20px;
+  content: "\f0c8";
+  width: 18px;
   display: inline-block;
   font-size: 18px;
   vertical-align: middle;
-  line-height: 22px;
-  color: #3478f3; /* Color del ícono cuando no está seleccionado */
+  line-height: 20px;
+  color: #78909c;
   cursor: pointer;
 }
-
 .checkboxWrapper input[type="checkbox"]:checked + label::before {
-  content: "\f046"; /* Este valor debe ser el ícono que desees para el checkbox seleccionado */
-  color: #3478f3; /* Color del ícono cuando está seleccionado */
-  cursor: pointer;
+  content: "\f14a";
+  color: #4caf50;
 }
-
-.checkboxWrapper label{
-margin-right: 10px;
-cursor: pointer;
-}
+.checkboxWrapper label { margin-left: 8px; cursor: pointer; } /* تغییر از right به left */

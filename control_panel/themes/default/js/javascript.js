@@ -1640,7 +1640,7 @@ function actualizarUI(data) {
 
                 if (queueData.Members) {
                     html += '<span>';
-                    html += '<strong>Agents:</strong>';
+                    html += '<strong>کارشناس:</strong>';
                     html += '</span>';
                     html += '<br>';
 
@@ -1655,8 +1655,8 @@ function actualizarUI(data) {
             if (queueParameters) {
             	var html = '';
             	html += '<div>';
-							html += '<span class="answered" style="margin-right: 20px"><strong title="Estos datos se actualizan cada 5 minutos.">Answered:</strong> (' + queueData.Completed + ')</span>';
-							html += '<span class="abandoned"><strong title="Estos datos se actualizan cada 5 minutos.">Abandoned:</strong> (' + queueData.Abandoned + ')</span>';
+							html += '<span class="answered" style="margin-right: 20px"><strong title="این اطلاعات هر ۵ دقیقه یک‌بار به‌روزرسانی می‌شوند..">پاسخ شده:</strong> (' + queueData.Completed + ')</span>';
+							html += '<span class="abandoned"><strong title="این اطلاعات هر ۵ دقیقه یک‌بار به‌روزرسانی می‌شوند..">بدون پاسخ:</strong> (' + queueData.Abandoned + ')</span>';
 							html += '</div>';
               queueParameters.innerHTML = html;
             }
@@ -1713,7 +1713,7 @@ function memberStatus(status, paused) {
     if (paused !== "0" && status !== "5") {
         return {
             statusImage: "<i class='fa fa-pause' style='padding-right:4px; padding-left:1px; font-size:13px'></i>",
-            circleHTML: '<div class="circle green" title="En Pausa (DND Agent)"></i></div>'
+circleHTML: '<div class="circle yellow" title="در حالت مکث"></div>'
         };
     }
 
@@ -1735,8 +1735,8 @@ function memberStatus(status, paused) {
             };
         case '5':
             return {
-                statusImage: '<img src="/modules/'+module_name+'/images/agent-disconected.png" alt="Desconectado" style="padding-right:1px;"/>',
-                circleHTML: '<div class="circle strong-red" title="Desconectado"></div>'
+statusImage: '<i class="fa fa-phone-slash" style="color:#e74c3c; font-size:16px;"></i>',
+        circleHTML: '<div class="circle strong-red" title="قطع شده"></div>'
             };
         case '6':
             return {

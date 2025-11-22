@@ -1,43 +1,86 @@
 <?php
-  /* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
-  Codificación: UTF-8
-  +----------------------------------------------------------------------+
-  | Issabel version 1.6-3                                               |
-  | http://www.issabel.org                                               |
-  +----------------------------------------------------------------------+
-  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
-  +----------------------------------------------------------------------+
-  | The contents of this file are subject to the General Public License  |
-  | (GPL) Version 2 (the "License"); you may not use this file except in |
-  | compliance with the License. You may obtain a copy of the License at |
-  | http://www.opensource.org/licenses/gpl-license.php                   |
-  |                                                                      |
-  | Software distributed under the License is distributed on an "AS IS"  |
-  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
-  | the License for the specific language governing rights and           |
-  | limitations under the License.                                       |
-  +----------------------------------------------------------------------+
-  | The Initial Developer of the Original Code is PaloSanto Solutions    |
-  +----------------------------------------------------------------------+
-  $Id: en.lang,v 1.1 2009-06-08 03:06:39 Oscar Navarrete onavarrete@palosanto.com Exp $ */
+/*
+  فایل ترجمه فارسی کامل — fa.lang
+  برای ماژول Control Panel (Isabel Call Monitoring)
+  آخرین ویرایش: 19 نوامبر 2025
+*/
+
 global $arrLangModule;
-$arrLangModule=array(
-"Control Panel" => "Operator Panel",
-"Name" => "Name",
-"New" => "New",
-"Old" => "Old",
-"Participants" => "Participants",
-"Participant" => "Participant",
-"Error when connecting to Asterisk Manager" => "Error when connecting to Asterisk Manager",
-"Loading" => "Loading",
-'Members' => 'Members',
-'Not Attended' => 'Not Attended',
-'Callers'   =>  'Callers',
-'No Callers' => 'No Callers',
-'Participant(s)' => 'Participant(s)',
-'Parked' => 'Parked',
-'Invalid or missing parameters' => 'Invalid or missing parameters',
-'Hide All' => 'Hide All',
-'Show All' => 'Show All',
+$arrLangModule = array(
+
+    // عنوان اصلی ماژول
+    "Control Panel"                 => "پنل اپراتور",
+
+    // عنوان بخش‌ها (هدرهای سبز و خاکستری)
+    "Extensions"                    => "داخلی",
+    "Queues"                        => "صف",
+    "Conferences"                   => "کنفرانس",
+    "Parking lots"                  => "پارکینگ تماس",
+    "SIP/IAX Trunks"                => "ترانک‌های SIP/IAX",
+
+    // متن‌های داخل صف (Queue)
+    "Answered:"                     => "پاسخ داده شده:",
+    "Abandoned:"                    => "ترک شده:",
+    "Customers in Queue:"           => "مشتریان در صف:",
+    "Agents"                        => "اپراتورها",
+
+    // وضعیت داخلی‌ها و ترانک‌ها
+    "In use"                        => "در حال مکالمه",
+    "Idle"                          => "آماده",
+    "Ringing"                       => "در حال زنگ",
+    "On Hold"                       => "در انتظار",
+    "Unavailable"                   => "در دسترس نیست",
+    "Not Registered"                => "ثبت‌نام نشده",
+    "Registered"                    => "ثبت شده",
+
+    // پارکینگ
+    "Parked call"                   => "تماس پارک شده",
+
+    // عنوان منطقه‌ها (Area 1, Area 2)
+    "Area 1 - 0 ext"                => "منطقه ۱",
+    "Area 2 - 0 ext"                => "منطقه ۲",
+    "Edit Name"                     => "ویرایش نام",
+
+    // سایر متن‌های عمومی
+    "Name"                          => "نام",
+    "New"                           => "جدید",
+    "Old"                           => "قدیمی",
+    "Participants"                  => "شرکت‌کنندگان",
+    "Participant"                   => "شرکت‌کننده",
+    "Members"                       => "اعضا",
+    "Callers"                       => "تماس‌گیرندگان",
+    "No Callers"                    => "بدون تماس‌گیرنده",
+    "Participant(s)"                => "شرکت‌کننده(ها)",
+    "Parked"                        => "پارک شده",
+
+    // پیام‌های خطا و وضعیت
+    "Error when connecting to Asterisk Manager" => "خطا در اتصال به مدیر آستریک",
+    "Loading"                       => "در حال بارگذاری",
+    "Invalid or missing parameters" => "پارامترهای نامعتبر یا گم‌شده",
+    "Hide All"                      => "مخفی کردن همه",
+    "Show All"                      => "نمایش همه",
+
+    // متغیرهای پنل (اسم منطقه‌ها)
+    "AREA_DESCR_EXTENSION"          => "داخلی‌ها",
+    "AREA_DESCR_TRUNKS"             => "ترانک‌های DAHDI",
+    "AREA_DESCR_TRUNKSSIP"          => "ترانک‌های VoIP",
+    "AREA_DESCR_QUEUES"             => "صف‌ها",
+    "AREA_DESCR_CONFERENCE"         => "کنفرانس‌ها",
+    "AREA_DESCR_PARKING"            => "پارکینگ‌ها",
+
+    // برچسب‌های داخل قالب‌ها
+    "LBL_EXT_CALLS"                 => "تماس‌های داخلی",
+    "LBL_EXT_NO_CALLS"              => "بدون تماس",
+    "LBL_TRUNK_CHANNELS"            => "کانال‌های ترانک",
+    "LBL_TRUNK_CALLS"               => "تماس‌های ترانک",
+    "LBL_QUEUE_AGENTS"              => "اپراتورهای صف",
+    "LBL_QUEUE_NO_AGENTS"           => "بدون اپراتور",
+    "LBL_QUEUE_CALLERS"             => "تماس‌گیرندگان در صف",
+    "LBL_QUEUE_NO_CALLERS"          => "بدون تماس در صف",
+    "LBL_CONF_PARTICIPANTS"         => "شرکت‌کنندگان",
+    "LBL_PARKED"                    => "پارک شده",
+    "LBL_SAVE_NAME"                 => "ذخیره",
+    "LBL_EDIT_NAME"                 => "ویرایش نام",
+
 );
-?>
+
