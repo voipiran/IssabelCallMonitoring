@@ -22,19 +22,23 @@ echo -e "${MAGENTA}                    https://voipiran.io                    ${
 echo -e "${MAGENTA}###############################################################${NC}"
 echo ""
 
-# حلقه تا وقتی درست جواب بده
+# حلقه تا وقتی درست جواب بده — بدون هیچ فاصله اضافی
 while : ; do
     echo -e "${BOLD}لطفاً زبان مورد نظر خود را انتخاب کنید:${NC}"
     echo ""
-    echo -e "   ${GREEN}1)${NC} فارسی (Persian) - نسخه کاملاً فارسی و راست‌چین"
-    echo -e "   ${GREEN}2)${NC} English - LTR version"
+    echo -e "${GREEN}1)${NC} فارسی (Persian) - نسخه کاملاً فارسی و راست‌چین"
+    echo -e "${GREEN}2)${NC} English - LTR version"
     echo ""
     read -p "انتخاب شما (1 یا 2) [پیش‌فرض: 1]: " choice
 
-    # اگر کاربر فقط Enter زد → فارسی
-    [[ -z "$choice" ]] && choice=1
+    # حذف تمام فاصله‌ها و کاراکترهای نامرئی از اول و آخر
+    choice=$(echo "$choice" | xargs)
 
-    # مقایسه دقیق و بدون مشکل
+    # اگر خالی بود → فارسی
+    if [[ -z "$choice" ]]; then
+        choice="1"
+    fi
+
     if [[ "$choice" == "1" || "$choice" == "۱" ]]; then
         echo -e "\n${GREEN}نسخه فارسی انتخاب شد.${NC}\n"
         VERSION="fa"
@@ -44,11 +48,11 @@ while : ; do
         VERSION="en"
         break
     else
-        echo -e "\n${RED}خطا: لطفاً فقط عدد 1 یا 2 را وارد کنید!${NC}\n"
+        echo -e "\n "${RED}خطا: لطفاً فقط عدد 1 یا 2 را وارد کنید!${NC}\n"
     fi
 done
 
-# ادامه نصب (بدون تغییر)
+# بقیه کد بدون تغییر
 echo "[1/4] در حال پاک‌سازی نصب قبلی..."
 rm -rf /var/www/html/modules/control_panel
 
@@ -61,7 +65,7 @@ else
     echo -e "${GREEN}نسخه فارسی با موفقیت نصب شد.${NC}"
 fi
 
-echo "[3/4] در حال اعمال منیوها در Issabel..."
+echo "[3/4] در حال اعمال منوها در Issabel..."
 yes | issabel-menumerge control.xml > /dev/null 2>&1
 
 echo "[4/4] تنظیم دسترسی‌ها..."
