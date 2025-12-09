@@ -23,17 +23,23 @@ echo -e "${MAGENTA}                    https://voipiran.io                    ${
 echo -e "${MAGENTA}###############################################################${NC}"
 echo ""
 
-# حلقه تا وقتی کاربر 1 یا 2 نزنه ادامه بده
+# حلقه تا وقتی کاربر درست جواب بده
 while true; do
     echo -e "${BOLD}لطفاً زبان مورد نظر خود را انتخاب کنید:${NC}"
     echo ""
     echo -e "   ${GREEN}1)${NC} فارسی (Persian) - نسخه کاملاً فارسی و راست‌چین"
     echo -e "   ${GREEN}2)${NC} English - LTR version"
     echo ""
-    read -p "انتخاب شما (1 یا 2): " choice
+    read -p "انتخاب شما (1 یا 2) [پیش‌فرض: 1]: " choice
 
-    case "$choice" in
-        1|۱|"")
+    # اگر فقط Enter زد → فارسی
+    if [[ -z "$choice" ]]; then
+        choice="1"
+    fi
+
+    # مقایسه بدون نقل قول (درست)
+    case $choice in
+        1|۱)
             echo -e "\n${GREEN}نسخه فارسی انتخاب شد.${NC}\n"
             VERSION="fa"
             break
@@ -50,11 +56,10 @@ while true; do
     esac
 done
 
-# پاک کردن نصب قبلی
+# ادامه نصب (دقیقاً مثل قبل)
 echo "[1/4] در حال پاک‌سازی نصب قبلی..."
 rm -rf /var/www/html/modules/control_panel
 
-# نصب نسخه انتخابی
 echo "[2/4] در حال نصب نسخه انتخابی..."
 if [ "$VERSION" = "en" ]; then
     cp -ar control_panel_en/ /var/www/html/modules/control_panel
@@ -64,20 +69,22 @@ else
     echo -e "${GREEN}نسخه فارسی با موفقیت نصب شد.${NC}"
 fi
 
-# اعمال منوها
 echo "[3/4] در حال اعمال منوها در Issabel..."
 yes | issabel-menumerge control.xml > /dev/null 2>&1
 
-# تنظیم دسترسی‌ها
 echo "[4/4] تنظیم دسترسی‌های فایل..."
 chown -R asterisk:asterisk /var/www/html/modules/control_panel
 chmod -R 755 /var/www/html/modules/control_panel
 
-# پیام نهایی
 echo ""
 echo -e "${MAGENTA}╔══════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${MAGENTA}║                نصب با موفقیت انجام شد!                      ║${NC}"
 echo -e "${MAGENTA}╚══════════════════════════════════════════════════════════════╝${NC}"
+echo ""
+echo -e "برای اعمال تغییرات:"
+echo -e "   ${BOLD}fwconsole restart${NC}"
+echo ""
+echo -e "پنل در منوی سمت چپ → ${BOLD}Control Panel${NC} در دسترس است."
 echo ""
 echo -e "توسعه‌یافته با ${RED}♥${NC} توسط ${BOLD}VoipIran.io${NC}"
 echo -e "https://voipiran.io"
