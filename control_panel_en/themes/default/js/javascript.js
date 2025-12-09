@@ -1640,7 +1640,7 @@ function actualizarUI(data) {
 
                 if (queueData.Members) {
                     html += '<span>';
-                    html += '<strong>کارشناس:</strong>';
+                    html += '<strong>Agents: </strong>';
                     html += '</span>';
                     html += '<br>';
 
@@ -1655,8 +1655,8 @@ function actualizarUI(data) {
             if (queueParameters) {
             	var html = '';
             	html += '<div>';
-							html += '<span class="answered" style="margin-right: 20px"><strong title="این اطلاعات هر ۵ دقیقه یک‌بار به‌روزرسانی می‌شوند..">پاسخ شده:</strong> (' + queueData.Completed + ')</span>';
-							html += '<span class="abandoned"><strong title="این اطلاعات هر ۵ دقیقه یک‌بار به‌روزرسانی می‌شوند..">بدون پاسخ:</strong> (' + queueData.Abandoned + ')</span>';
+							html += '<span class="answered" style="margin-right: 20px"><strong title="این اطلاعات هر ۵ دقیقه یک‌بار به‌روزرسانی می‌شوند..">Answered:</strong> (' + queueData.Completed + ')</span>';
+							html += '<span class="abandoned"><strong title="این اطلاعات هر ۵ دقیقه یک‌بار به‌روزرسانی می‌شوند..">Abandoned:</strong> (' + queueData.Abandoned + ')</span>';
 							html += '</div>';
               queueParameters.innerHTML = html;
             }

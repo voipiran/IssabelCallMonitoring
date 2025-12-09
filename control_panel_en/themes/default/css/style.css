@@ -1,0 +1,629 @@
+/* === فایل CSS کامل — سبک QPanel (سبز، سفید، کارت‌های شیک) + پشتیبانی کامل RTL و فارسی === */
+/* فقط کپی کنید و جایگزین کنید — متن فارسی راست‌چین، Extensions → اکستنشن‌ها، و غیره */
+
+/* به جای * که همه چیز رو خراب می‌کرد */
+body, div, span, p, a, td, th, li, dt, dd, input, textarea, select, label, h1, h2, h3, h4, h5, h6 {
+    direction: ltr !important;
+    text-align: left !important;
+    font-family: "IRANSans", Tahoma, sans-serif !important;
+}
+
+/* مهم: آیکون‌های FontAwesome رو از این قانون مستثنی کن تا مربع نشن */
+i, .fa, .fas, .far, .fab, [class^="fa-"], [class*=" fa-"] {
+    direction: ltr !important;
+    text-align: center !important;
+    font-family: "Font Awesome 5 Free", "Font Awesome 5 Brands", "FontAwesome" !important;
+}
+
+.pbxpanel {
+  padding: 6px;
+  width: auto;
+  height: auto;
+  border: 1px solid #a0a0a0;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #f0f4f7, #e0e6eb);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  list-style-type: none;
+  color: #2c3e50;
+  font-size: 15px;
+}
+.pbxpanel h1 { font-size: 24px; font-weight: bold; margin: 10px 0; color: #2c3e50; }
+.pbxpanel h2 { font-size: 20px; font-weight: bold; margin: 8px 0; color: #34495e; }
+.pbxpanel p { font-size: 16px; margin: 6px 0; color: #555; }
+
+.pbxelement {
+  display: inline-block;
+  width: 240px;
+  height: 58px;
+  border: 1px solid #cfd8dc;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin: 4px 2px;
+  padding: 6px 8px;
+  position: relative;
+  transition: all 0.2s ease;
+  font-size: 12.5px;
+  color: #000;
+  box-sizing: border-box;
+}
+.pbxelement > div { white-space: nowrap; }
+.pbxelement:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: #90a4ae;
+}
+.pbxactive {
+  background: #d0f5d0;
+  border-color: #4caf50;
+  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.2);
+}
+
+.operator-title-container {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 5px 10px;
+  margin-bottom: 6px;
+  border-radius: 8px;
+  background: #2e7d32;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  transition: background 0.25s ease;
+  z-index: 2;
+  border: none;
+}
+.operator-title-container:hover {
+  background: #1b5e20;
+}
+
+.Extensions-List {
+  max-height: 500px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #4caf50 #e8f5e8;
+  line-height: initial;
+  padding: 4px;
+}
+.Extensions-List::-webkit-scrollbar, .Queue-Container-Agent-Client::-webkit-scrollbar, .parkinglots-list::-webkit-scrollbar {
+  width: 5px;
+}
+.Extensions-List::-webkit-scrollbar-thumb, .Queue-Container-Agent-Client::-webkit-scrollbar-thumb, .parkinglots-list::-webkit-scrollbar-thumb {
+  background-color: #4caf50;
+  border-radius: 3px;
+}
+.Extensions-List::-webkit-scrollbar-track, .Queue-Container-Agent-Client::-webkit-scrollbar-track, .parkinglots-list::-webkit-scrollbar-track {
+  background: #e8f5e8;
+  border-radius: 3px;
+}
+
+.parkinglots-list {
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #4caf50 #e8f5e8;
+  padding: 4px;
+}
+
+a.pbxtooltip {
+  text-decoration: none;
+}
+a.pbxtooltip > img.constantsize {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+}
+a.pbxtooltip > div {
+  display: none;
+  z-index: 6000;
+  position: absolute;
+  top: 1.2em;
+  right: 2.2em; /* تغییر از left به right برای RTL */
+  min-width: 180px;
+  padding: 10px;
+  background: #ffffff;
+  color: #2c3e50;
+  border: 1px solid #a0a0a0;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  font-size: 12px;
+  white-space: nowrap;
+}
+a.pbxtooltip:hover > div {
+  display: block;
+  animation: fadeIn 0.25s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+a.pbxtooltip > div > ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 4px;
+}
+
+span.monitor {
+  color: #1976d2;
+  font-size: 12px;
+}
+img.icon {
+  padding: 2px 2px 0 0;
+  border: 0;
+}
+
+dl.faq2 {
+  padding: 0;
+}
+
+span.paneledittitle {
+  float: left; /* تغییر از right به left برای RTL */
+  color: #4caf50;
+  font-size: 11px;
+  margin-right: 60px;
+  cursor: pointer;
+}
+
+/* ========== تغییرات جدید اینجا ========== */
+div.statusbar {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.QueueView-large {
+  width: 98%;
+  height: auto;
+  padding: 2px;
+  text-align: right;
+  direction: rtl;
+}
+
+.Queue-Container-Agent-Client {
+  display: flex;
+  border-top: 1px solid #cfd8dc;
+  overflow: auto;
+  max-height: 150px;
+  scrollbar-width: thin;
+  scrollbar-color: #4caf50 #e8f5e8;
+  text-align: right;
+  direction: rtl;
+  padding: 4px;
+}
+
+.ParkinglotView-large, .ConferenceView-large {
+  width: 45%;
+  min-height: 50px;
+  padding-right: 4px;
+  margin-left: 4px;
+}
+
+.containerAll {
+  border: 1px solid #b0bec5;
+  border-radius: 10px;
+  background: #f8fcf8;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  overflow: hidden;
+}
+
+.left-container, .right-container {
+  transition: width 0.5s ease;
+}
+/* تغییرات موقعیت کانتینرها */
+.left-container {
+  float: left;
+  width: 69%;
+  min-width: 550px;
+  padding-top: 10px;
+  text-align: left;
+  direction: rtl;
+}
+.right-container {
+  float: right;
+  width: 30%;
+  min-width: 470px;
+  text-align: left;
+  direction: ltr;
+}
+
+/* استایل برای عناوین در right-container (صف، کنفرانس، پارکینگ) */
+.right-container .pbxpanel dt {
+  text-align: left !important;
+  direction: rtl !important;
+  padding-left: 15px !important;
+}
+
+/* استایل برای محتوای right-container */
+.right-container .pbxpanel dd {
+  text-align: right !important;
+  direction: ltr !important;
+}
+
+/* استایل برای صف‌ها در right-container */
+.right-container .Queue-Container {
+  text-align: left !important;
+  direction: ltr !important;
+}
+
+/* استایل برای کنفرانس و پارکینگ در right-container */
+.right-container .ConferenceView-large,
+.right-container .ParkinglotView-large {
+  text-align: left !important;
+  direction: ltr !important;
+}
+
+/* Responsive Media Queries (بدون تغییر) */
+@media only screen and (max-width: 1399px) {
+  .left-container, .right-container { float: none; width: 100%; }
+}
+@media only screen and (min-width: 1400px) and (max-width: 1479px) {
+  .left-container { width: 52%; }
+  .right-container { width: 35%; }
+}
+@media only screen and (min-width: 1480px) and (max-width: 1599px) {
+  .left-container { width: 57%; }
+  .right-container { width: 35%; }
+}
+@media only screen and (min-width: 1600px) and (max-width: 1659px) {
+  .left-container { width: 60%; }
+  .right-container { width: 30%; }
+}
+@media only screen and (min-width: 1660px) and (max-width: 1749px) {
+  .left-container { width: 63%; }
+  .right-container { width: 30%; }
+}
+@media only screen and (min-width: 1750px) and (max-width: 1900px) {
+  .left-container { width: 65%; }
+  .right-container { width: 30%; }
+}
+
+.line-monitor {
+  width: 100%;
+  display: flex-start;
+  margin-top: 8px;
+  padding: 0 6px;
+}
+
+.phone-mail-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0 6px;
+}
+.phone-icon, .mail-icon {
+  border: black solid 0px;
+  margin: 0 3px;
+}
+
+.utilities-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0;
+}
+
+#Acl {
+  width: 15%;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 8px;
+  justify-content: start;
+}
+
+.Extensions-Calls-Count {
+  width: 50%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 6px;
+}
+
+.Registered, .NotRegistered {
+  width: 25%;
+  height: 82px;
+  flex-direction: column;
+  text-align: center;
+  border: 1px solid #b0bec5;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin: 4px;
+  padding: 6px;
+  min-width: 150px;
+  transition: transform 0.2s ease;
+}
+.Registered:hover, .NotRegistered:hover { transform: translateY(-1px); }
+.Registered span, .NotRegistered span {
+  font-size: 15px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.operator-button-container {
+  width: 40%;
+  padding: 8px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.utility-button {
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  border-radius: 10px;
+  border: 1px solid #42a5f5;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.25s ease;
+  margin: 4px;
+}
+.utility-button:hover {
+  background: #42a5f5;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(66, 165, 245, 0.3);
+}
+
+.button-with-description {
+  width: 62px;
+  text-align: center;
+  margin-left: 4px;
+}
+
+.agent-container {
+  display: flex;
+  align-items: center;
+  margin-left: 3px;
+  padding: 0px;
+  margin-bottom: 0px;
+}
+.circle {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 3px;
+  border: 1px solid #90a4ae;
+  text-align: center;
+}
+.green { background-color: #4CAF50; }
+.orange { background-color: #FF9800; }
+.orange-yellow { background: linear-gradient(to right, #FF9800 50%, #FFEB3B 50%); }
+.red { background-color: #F44336; }
+.strong-red { background-color: #D32F2F; }
+.yellow { background-color: #FFEB3B; }
+.gray { background-color: #9E9E9E; }
+
+.notification-container {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  background: white;
+  border: 1px solid #cfd8dc;
+  padding: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.4s;
+  border-radius: 8px;
+}
+.notification-message { font-size: 16px; }
+
+.webPhoneContainer {
+  height: 100%;
+  width: 99%;
+  display: none;
+  border: 1px solid #b0bec5;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  list-style-type: none;
+  color: #2c3e50;
+  padding: 8px;
+}
+
+.webPhonePanel {
+  padding: 8px;
+  width: auto;
+  height: auto;
+  border: 1px solid #b0bec5;
+  border-radius: 10px;
+  background: #f8fcf8;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  list-style-type: none;
+  color: #2c3e50;
+  font-size: 15px;
+  height: 390px;
+}
+
+.webPhonePosition {
+  height: 350px;
+  width: 100%;
+  padding: 6px;
+}
+.webPhonePosition dt {
+  margin-top: 0;
+  border: solid 1px #2e7d32;
+  padding: 5px 10px;
+  line-height: 1.5;
+  font-size: 13px;
+  z-index: 2;
+  background: #2e7d32;
+  color: white;
+  margin-bottom: 4px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.userAclModal {
+  height: 550px;
+  background-color: #ffffff;
+  border: 1px solid #b0bec5;
+  position: absolute;
+  top: 20%;
+  right: 30%;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  transition: all 0.3s ease;
+  padding: 12px;
+}
+
+.closeButtonAcl {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  cursor: pointer;
+  color: #e53935;
+  padding: 8px;
+  font-size: 18px;
+  transition: all 0.25s ease;
+}
+.closeButtonAcl:hover {
+  color: #c62828;
+  background-color: #ffebee;
+  border-radius: 50%;
+}
+
+.aclInformationContainer { display: flex; flex-wrap: wrap; padding: 6px; }
+.container-aclInformationDiv { padding: 12px; flex: 1; min-width: 250px; }
+.title-container-acl {
+  text-align: center;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.aclInformationDiv {
+  width: 100%;
+  height: 300px;
+  max-height: 300px;
+  overflow: auto;
+  border: 1px solid #cfd8dc;
+  padding: 10px;
+  box-sizing: border-box;
+  background-color: #fafafa;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  transition: box-shadow 0.25s ease;
+}
+.aclInformationDiv:hover { box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12); }
+
+.aclSelectBox {
+  display: block;
+  margin: 16px auto 0;
+  min-width: 210px;
+  height: 38px;
+  font-size: 16px;
+  border: 1px solid #b0bec5;
+  border-radius: 8px;
+  padding: 4px 10px;
+  transition: all 0.25s ease;
+}
+.aclSelectBox:hover { border-color: #78909c; }
+
+.queueItem, .extensionItem {
+  padding: 6px 10px;
+  margin: 4px;
+  border: 1px solid #b0bec5;
+  border-radius: 8px;
+  background: #fafafa;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 13px;
+  color: #2c3e50;
+}
+.queueItem:hover, .extensionItem:hover {
+  background: #4caf50;
+  color: white;
+  border-color: #4caf50;
+  transform: translateY(-1px);
+}
+
+.buttonsContainerAcl {
+  display: flex;
+  justify-content: center;
+  margin: 12px;
+}
+.buttonsContainerAcl button {
+  padding: 8px 18px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  height: 40px;
+  width: 160px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+.buttonsContainerAcl button:first-child {
+  background: #4caf50;
+  color: white;
+}
+.buttonsContainerAcl button:first-child:hover {
+  background: #388e3c;
+  transform: translateY(-1px);
+}
+.buttonsContainerAcl button:last-child {
+  background: #e53935;
+  color: white;
+}
+.buttonsContainerAcl button:last-child:hover {
+  background: #c62828;
+  transform: translateY(-1px);
+}
+
+.arrow-container { display: flex; flex-direction: column; justify-content: center; padding: 6px; }
+.arrow-button {
+  font-size: 24px;
+  background: transparent;
+  cursor: pointer;
+  margin: 6px;
+  padding: 3px;
+  border-radius: 8px;
+  min-width: 34px;
+  border: 1px solid #cfd8dc;
+  transition: all 0.2s ease;
+}
+.arrow-button:hover {
+  background: #4caf50;
+  color: white;
+  border-color: #4caf50;
+  transform: scale(1.08);
+}
+.arrow-button.right { color: #4caf50; }
+.arrow-button.left { color: #e53935; }
+
+.checkboxContainerAcl { color: black; }
+.checkboxAclButtons, .checkboxAclAdminContainer {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 4px;
+  justify-content: center;
+  padding: 6px;
+}
+
+.checkboxWrapper input[type="checkbox"] { display: none; cursor: pointer; }
+.checkboxWrapper input[type="checkbox"] + label::before {
+  font-family: FontAwesome;
+  content: "\f0c8";
+  width: 18px;
+  display: inline-block;
+  font-size: 18px;
+  vertical-align: middle;
+  line-height: 20px;
+  color: #78909c;
+  cursor: pointer;
+}
+.checkboxWrapper input[type="checkbox"]:checked + label::before {
+  content: "\f14a";
+  color: #4caf50;
+}
+.checkboxWrapper label { margin-left: 8px; cursor: pointer; }

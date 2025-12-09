@@ -18,10 +18,10 @@
             <!-- TODO: i18n -->
 {literal}
 {{#if connected}}
-    <div style="text-align: center; padding: 8px 0 10px;">
-        <span style="color: #2e7d32; font-weight: bold; font-size: 14px; display: block; margin-bottom: 6px;">
-            اتصال برقرار است
-        </span>
+<div style="text-align: center; padding: 8px 0 10px; display: flex; justify-content: center; align-items: center; flex-direction: column;">
+    <span style="color: #2e7d32; font-weight: bold; font-size: 14px; margin-bottom: 6px; position: absolute; left: 30px; top: 147px;">
+        Connected
+    </span>
 
         <div style="display: inline-flex; gap: 16px; align-items: center;">
             
@@ -42,7 +42,7 @@
             ">
                 <span style="font-size: 30px; color: #2e7d32; font-weight: 900;" class="Count-Registered"></span>
                 <span style="color: #2e7d32; font-size: 12px; white-space: nowrap;">
-                    در حال مکالمه
+                    Extensions Online
                 </span>
             </div>
 
@@ -63,16 +63,16 @@
             ">
                 <span style="font-size: 30px; color: #d32f2f; font-weight: 900;" class="Count-NotRegistered"></span>
                 <span style="color: #c62828; font-size: 12px; white-space: nowrap;">
-                    آماده
+                    Extensions Offline
                 </span>
             </div>
 
         </div>
     </div>
 {{else}}
-    <div style="text-align: center; padding: 12px 0;">
-        <span style="color: #e53935; font-weight: bold; font-size: 14px; animation: pulse 1.8s infinite;">
-            در حال اتصال ...
+    <div style="text-align: left; padding: 12px 0;">
+        <span style="color: #e53935; font-weight: bold; font-size: 14px; animation: pulse 1.8s infinite; position: absolute; left: 30px; top: 147px;">
+              Connecting...
         </span>
     </div>
 {{/if}}
@@ -91,7 +91,8 @@
         {literal}
             {{#view App.PBXPanelView controllerBinding="extensions" }}
               <dt class="operator-title-container" id="operator-title-container">
-                <i class="fa fa-phone" style="font-size:20px; padding-right:5px;"></i> {/literal}{$AREA_DESCR_EXTENSION}{literal}
+               <i class="fa fa-phone" style="font-size:20px; padding-right:5px;"></i> {/literal}{$AREA_DESCR_EXTENSION}{literal} 
+
               </dt>
                  <div class="Extensions-List" id="Extensions-List">
                     {{#if finishedloading}}
@@ -112,7 +113,7 @@
                 {literal}{{#view App.FAQView }}{/literal}
         {literal}{{#view App.BaseSortableView }}{/literal}
         {* La lista de las extensiones asignadas al área 1 *}
-            {literal}
+          {*  {literal}
                 {{#view App.PBXPanelView controllerBinding="area1" }}
                     {{view App.EditableTitleView }}
                     <dd>
@@ -131,9 +132,9 @@
                     </div>
                     </dd>
                 {{/view}}
-            {/literal}</br>
+            {/literal}</br> *}
         {* La lista de las extensiones asignadas al área 2 *}
-                {literal}
+             {*   {literal}
                 {{#view App.PBXPanelView controllerBinding="area2" }}
                     {{view App.EditableTitleView }}
                     <dd>
@@ -152,7 +153,7 @@
                     </div>
                     </dd>
                 {{/view}}
-            {/literal}</br>
+            {/literal}</br>  *}
 
         {literal}{{/view }}{/literal} {* App.BaseSortableView *}
         {literal}{{/view}}{/literal} {* App.FAQView *}
@@ -304,14 +305,14 @@
     {{/if}}
 </div><br/>
 
-<div class="line-monitor" style="position:absolute; right:8px; top:55%; transform:translateY(-50%); white-space:nowrap; font-size:12px; line-height:1.3; text-align:right; display:flex; flex-direction:column; align-items:flex-end;">
+<div class="line-monitor" style="position:absolute; right:8px; top:55%; transform:translateY(-50%); white-space:nowrap; font-size:12px; line-height:1.3; text-align:right; display:flex; flex-direction:column; align-items:flex-start;">
       <div><img src="modules/{/literal}{$module_name}{literal}/images/line.png" style="width:20px; height:20px; opacity:0.8;" /></div>
       <div><img src="modules/{/literal}{$module_name}{literal}/images/line.png" style="width:20px; height:20px; opacity:0.8;" /></div>
 </div>
 
 
 
-<div class="RemoteExtension" style="position:absolute; left:18px; right:auto; top:55%; transform:translateY(-50%); white-space:nowrap; font-size:12px; line-height:1.3; text-align:left; display:flex; flex-direction:column; align-items:flex-start;">
+<div class="RemoteExtension" style="position:absolute; left:28px; right:auto; top:55%; transform:translateY(-50%); white-space:nowrap; font-size:12px; line-height:1.3; text-align:left; display:flex; flex-direction:column; align-items:flex-start; margin-top:18px;">
     {{#each active}}
         <div class="monitor" title="{{Channel}}" style="text-align:left;">{{formatSince}}: {{remoteExten}}</div>
     {{/each}}
@@ -420,24 +421,25 @@
         {literal}
 
         <!-- هدر سبز ملایم و تمیز -->
-        <div style="background:#27ae60; color:white; padding:10px 16px; text-align:right; font-weight:600; position:relative;">
-            صف: {{extension}} 
-            <span style="margin-right:8px; opacity:0.9; font-size:13px;">({{view.truncatedDescription}})</span>
+<div style="background:#27ae60; color:white; padding:10px 16px; text-align:right; font-weight:600; position:relative;">
+    Queue: {{extension}} 
+    <span style="margin-right:8px; opacity:0.9; font-size:13px;">({{view.truncatedDescription}})</span>
 
-            <i class="fa fa-refresh" title="بازنشانی آمار"
-               style="position:absolute; left:14px; top:11px; font-size:20px; cursor:pointer;"
-               onclick="refreshQueueParameters(this.offsetParent.offsetParent.dataset.idattr)"></i>
-        </div>
+    <i class="fa fa-refresh" title="بازنشانی آمار"
+       style="position:absolute; right:14px; top:11px; font-size:20px; cursor:pointer;"
+       onclick="refreshQueueParameters(this.offsetParent.offsetParent.dataset.idattr)"></i>
+</div>
+
 
         <!-- آمار — ساده، تمیز و بزرگ -->
         <div class="queueParameters" style="padding:14px 16px; background:#f9fdfa; display:flex; justify-content:space-around; border-bottom:1px solid #e8f5e9; font-size:14px;">
             <div style="text-align:center;">
                 <div style="font-size:28px; font-weight:bold; color:#27ae60;">{{answered}}</div>
-                <div style="color:#16a085; margin-top:4px;">پاسخ داده شده</div>
+                <div style="color:#16a085; margin-top:4px;">Answered: </div>
             </div>
             <div style="text-align:center;">
                 <div style="font-size:28px; font-weight:bold; color:#e74c3c;">{{abandoned}}</div>
-                <div style="color:#c0392b; margin-top:4px;">ترک شده</div>
+                <div style="color:#c0392b; margin-top:4px;">Abandoned: </div>
             </div>
         </div>
 
@@ -445,7 +447,7 @@
         <div class="Queue-Container-Agent-Client" style="display:flex;">
             <div class="Queue-Agents" style="width:60%; background:#f9fdfa; padding:12px 14px;">
                 <div style="background:#e8f7ee; color:#27ae60; font-weight:bold; text-align:center; padding:6px 10px; border-radius:6px; margin-bottom:8px; font-size:13px;">
-                    اپراتورها
+                    Agents
                 </div>
                 {{#each agents}}
                     {{view App.AgentView}}
@@ -454,7 +456,7 @@
 
             <div style="width:40%; background:#ffffff; padding:12px 10px;">
                 <div style="background:#e3f2fd; color:#2980b9; font-weight:bold; text-align:center; padding:6px 10px; border-radius:6px; margin-bottom:8px; font-size:13px;">
-                    مشتریان در صف: <b style="color:#e67e22;">{{callers.length}}</b>
+                    Customers in Queue: <b style="color:#e67e22;">{{callers.length}}</b>
                 </div>
                 <div style="max-height:130px; overflow-y:auto;">
                     {{#each callers}}

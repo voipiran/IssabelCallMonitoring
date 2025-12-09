@@ -1,0 +1,56 @@
+<?php
+/* vim: set expandtab tabstop=4 softtabstop=4 shiftwidth=4:
+  Codificación: UTF-8
+  +----------------------------------------------------------------------+
+  | Issabel version 0.5                                                  |
+  | http://www.issabel.org                                               |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2006 Palosanto Solutions S. A.                         |
+  +----------------------------------------------------------------------+
+  | The contents of this file are subject to the General Public License  |
+  | (GPL) Version 2 (the "License"); you may not use this file except in |
+  | compliance with the License. You may obtain a copy of the License at |
+  | http://www.opensource.org/licenses/gpl-license.php                   |
+  |                                                                      |
+  | Software distributed under the License is distributed on an "AS IS"  |
+  | basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See  |
+  | the License for the specific language governing rights and           |
+  | limitations under the License.                                       |
+  +----------------------------------------------------------------------+
+  | The Initial Developer of the Original Code is PaloSanto Solutions    |
+  +----------------------------------------------------------------------+
+  $Id: es.lang,v 1.7 2007/09/05 00:36:42 alex Exp $ */
+global $arrLangModule;
+$arrLangModule = array(
+    "Control Panel" => "Панель Оператора",
+    "Name" => "Название",
+    "New" => "Новый",
+    "Old" => "Старый",
+    "Participants" => "Участники",
+    "Participant" => "Участник",
+    "Error when connecting to Asterisk Manager" => "Ошибка соединения с Asterisk Manager",
+    "Loading" => "Загрузка",
+    "Area 1" => "Площадка 1",
+    "Area 2" => "Площадка 2",
+    "Area 3" => "Площадка 3",
+    "Conferences" => "Конференции",
+    "Extensions" => "Внутренние номера",
+    "Parking lots" => "Парковка Вызовов",
+    "Queues" => "Очереди",
+    "DAHDI Trunks" => "Транки DAHDI ",
+    "SIP/IAX Trunks" => "Транки SIP/IAX",
+    "Edit Name" => "Редактировать Название",
+    "Half waiting time Queue" => "Среднее Время Ожидания в Очереди",
+    "Calls in Queue" => "Вызовов в Очереди",
+    "Reload" => "Обновить",
+    "Members" => "Члены",
+    "Not Attended" => "Автоматическая",
+    "Callers" => "Вызовы",
+    "No Callers" => "Нет вызовов",
+    "Participant(s)" => "Участник(и)",
+    "Parked" => "Парковка",
+    "Invalid or missing parameters" => "Недействительные или отсутствующие параметры",
+    "Hide All" => "Скрыть Все",
+    "Show All" => "Показать Все",
+);
+?>
