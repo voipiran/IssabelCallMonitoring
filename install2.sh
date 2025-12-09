@@ -1,7 +1,6 @@
 #!/bin/bash
 # اسکریپت نصب هوشمند ماژول Control Panel (فارسی / انگلیسی)
 # توسعه یافته توسط VoipIran.io
-
 clear
 # Colorize output
 RED='\033[0;31m'
@@ -23,8 +22,8 @@ echo -e "${MAGENTA}                    https://voipiran.io                    ${
 echo -e "${MAGENTA}###############################################################${NC}"
 echo ""
 
-# حلقه تا وقتی کاربر درست جواب بده
-while true; do
+# حلقه تا وقتی درست جواب بده
+while : ; do
     echo -e "${BOLD}لطفاً زبان مورد نظر خود را انتخاب کنید:${NC}"
     echo ""
     echo -e "   ${GREEN}1)${NC} فارسی (Persian) - نسخه کاملاً فارسی و راست‌چین"
@@ -32,31 +31,24 @@ while true; do
     echo ""
     read -p "انتخاب شما (1 یا 2) [پیش‌فرض: 1]: " choice
 
-    # اگر فقط Enter زد → فارسی
-    if [[ -z "$choice" ]]; then
-        choice="1"
-    fi
+    # اگر کاربر فقط Enter زد → فارسی
+    [[ -z "$choice" ]] && choice=1
 
-    # مقایسه بدون نقل قول (درست)
-    case $choice in
-        1|۱)
-            echo -e "\n${GREEN}نسخه فارسی انتخاب شد.${NC}\n"
-            VERSION="fa"
-            break
-            ;;
-        2|۲)
-            echo -e "\n${GREEN}نسخه انگلیسی انتخاب شد.${NC}\n"
-            VERSION="en"
-            break
-            ;;
-        *)
-            echo -e "\n${RED}خطا: لطفاً فقط عدد 1 یا 2 را وارد کنید!${NC}\n"
-            sleep 1
-            ;;
-    esac
+    # مقایسه دقیق و بدون مشکل
+    if [[ "$choice" == "1" || "$choice" == "۱" ]]; then
+        echo -e "\n${GREEN}نسخه فارسی انتخاب شد.${NC}\n"
+        VERSION="fa"
+        break
+    elif [[ "$choice" == "2" || "$choice" == "۲" ]]; then
+        echo -e "\n${GREEN}نسخه انگلیسی انتخاب شد.${NC}\n"
+        VERSION="en"
+        break
+    else
+        echo -e "\n${RED}خطا: لطفاً فقط عدد 1 یا 2 را وارد کنید!${NC}\n"
+    fi
 done
 
-# ادامه نصب (دقیقاً مثل قبل)
+# ادامه نصب (بدون تغییر)
 echo "[1/4] در حال پاک‌سازی نصب قبلی..."
 rm -rf /var/www/html/modules/control_panel
 
@@ -69,10 +61,10 @@ else
     echo -e "${GREEN}نسخه فارسی با موفقیت نصب شد.${NC}"
 fi
 
-echo "[3/4] در حال اعمال منوها در Issabel..."
+echo "[3/4] در حال اعمال منیوها در Issabel..."
 yes | issabel-menumerge control.xml > /dev/null 2>&1
 
-echo "[4/4] تنظیم دسترسی‌های فایل..."
+echo "[4/4] تنظیم دسترسی‌ها..."
 chown -R asterisk:asterisk /var/www/html/modules/control_panel
 chmod -R 755 /var/www/html/modules/control_panel
 
@@ -80,12 +72,7 @@ echo ""
 echo -e "${MAGENTA}╔══════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${MAGENTA}║                نصب با موفقیت انجام شد!                      ║${NC}"
 echo -e "${MAGENTA}╚══════════════════════════════════════════════════════════════╝${NC}"
-echo ""
-echo -e "برای اعمال تغییرات:"
-echo -e "   ${BOLD}fwconsole restart${NC}"
-echo ""
-echo -e "پنل در منوی سمت چپ → ${BOLD}Control Panel${NC} در دسترس است."
-echo ""
+
 echo -e "توسعه‌یافته با ${RED}♥${NC} توسط ${BOLD}VoipIran.io${NC}"
 echo -e "https://voipiran.io"
 echo ""
