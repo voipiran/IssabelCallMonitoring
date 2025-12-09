@@ -1,6 +1,7 @@
 #!/bin/bash
 # اسکریپت نصب هوشمند ماژول Control Panel (فارسی / انگلیسی)
 # توسعه یافته توسط VoipIran.io
+
 clear
 # Colorize output
 RED='\033[0;31m'
@@ -22,7 +23,7 @@ echo -e "${MAGENTA}                    https://voipiran.io                    ${
 echo -e "${MAGENTA}###############################################################${NC}"
 echo ""
 
-# حلقه تا وقتی درست جواب بده — بدون هیچ فاصله اضافی
+# حلقه تا وقتی درست جواب بده
 while : ; do
     echo -e "${BOLD}لطفاً زبان مورد نظر خود را انتخاب کنید:${NC}"
     echo ""
@@ -31,10 +32,10 @@ while : ; do
     echo ""
     read -p "انتخاب شما (1 یا 2) [پیش‌فرض: 1]: " choice
 
-    # حذف تمام فاصله‌ها و کاراکترهای نامرئی از اول و آخر
+    # حذف فاصله‌های اول و آخر
     choice=$(echo "$choice" | xargs)
 
-    # اگر خالی بود → فارسی
+    # اگر کاربر فقط Enter زد → فارسی
     if [[ -z "$choice" ]]; then
         choice="1"
     fi
@@ -48,11 +49,11 @@ while : ; do
         VERSION="en"
         break
     else
-        echo -e "\n "${RED}خطا: لطفاً فقط عدد 1 یا 2 را وارد کنید!${NC}\n"
+        echo -e "\n${RED}خطا: لطفاً فقط عدد 1 یا 2 را وارد کنید!${NC}\n"
     fi
 done
 
-# بقیه کد بدون تغییر
+# ادامه نصب
 echo "[1/4] در حال پاک‌سازی نصب قبلی..."
 rm -rf /var/www/html/modules/control_panel
 
@@ -76,6 +77,7 @@ echo ""
 echo -e "${MAGENTA}╔══════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${MAGENTA}║                نصب با موفقیت انجام شد!                      ║${NC}"
 echo -e "${MAGENTA}╚══════════════════════════════════════════════════════════════╝${NC}"
+echo ""
 echo -e "توسعه‌یافته با ${RED}♥${NC} توسط ${BOLD}VoipIran.io${NC}"
 echo -e "https://voipiran.io"
 echo ""
