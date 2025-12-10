@@ -31,6 +31,8 @@ Developed by Hamed Koohfallah (VOIPIRAN) – completely free for everyone.
 
 
 > با ❤️ توسعه‌یافته توسط [VoipIran.io](https://voipiran.io)
+---
+## Installation
 Just Copy and Paste on your Linux CLI:
 ```
 curl -L -o callmonitoring.zip https://github.com/voipiran/IssabelCallMonitoring/archive/master.zip && \
