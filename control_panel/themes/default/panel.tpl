@@ -153,6 +153,28 @@
                     </dd>
                 {{/view}}
             {/literal}</br>
+			
+			        {* La lista de las extensiones asignadas al área 3 *}
+                {literal}
+                {{#view App.PBXPanelView controllerBinding="area3" }}
+                    {{view App.EditableTitleView }}
+                    <dd>
+                    <div class="Extensions-List" id="Extensions-List">
+                        {{#if finishedloading}}
+                            {{#view App.SortablePanelView }}
+                                {{#each }}
+                                    {{view App.ExtensionView}}
+                                {{else}}
+                                    <br/>
+                                {{/each}}
+                                {{/view}}
+                            {{else}}
+                            <img class="icon" src="modules/{/literal}{$module_name}{literal}/images/loading.gif"/>
+                        {{/if}}
+                    </div>
+                    </dd>
+                {{/view}}
+            {/literal}</br>
 
         {literal}{{/view }}{/literal} {* App.BaseSortableView *}
         {literal}{{/view}}{/literal} {* App.FAQView *}
