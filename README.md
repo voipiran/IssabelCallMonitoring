@@ -1,3 +1,7 @@
+![GitHub stars](https://img.shields.io/github/stars/voipiran/AsteriskGrafana?style=for-the-badge)
+![GitHub last commit](https://img.shields.io/github/last-commit/voipiran/AsteriskGrafana?style=for-the-badge)
+![License](https://img.shields.io/github/license/voipiran/AsteriskGrafana?style=for-the-badge)
+
 ![Issabel Call Monitoring - VoipIran](https://raw.githubusercontent.com/voipiran/IssabelCallMonitoring/main/image.jpg)
 ![Issabel Call Monitoring - VoipIran](https://raw.githubusercontent.com/voipiran/IssabelCallMonitoring/main/image-en.png)
 ## IssabelCallMonitoring
