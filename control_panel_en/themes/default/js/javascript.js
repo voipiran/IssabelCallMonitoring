@@ -40,6 +40,34 @@ $.extend($.ui.draggable.prototype, (function (orig) {
 var module_name = 'control_panel';
 var App = null;
 
+// Retain unchanged models; transmit only changed or removed channel records.
+function applyCallCollectionChanges(pbxobject, changes) {
+    for (var field in changes) {
+        if (field !== 'active' && field !== 'callers') continue;
+        var delta = changes[field];
+        var current = pbxobject.get(field) || [];
+        var replaced = Object.create(null);
+        delta.remove.forEach(function(channel) { replaced[channel] = true; });
+        delta.upsert.forEach(function(call) { replaced[call.Channel] = true; });
+        var next = current.filter(function(call) {
+            var channel = typeof call.get === 'function' ? call.get('Channel') : call.Channel;
+            return !replaced[channel];
+        });
+        delta.upsert.forEach(function(call) {
+            if (field === 'active') {
+                call.localExtension = pbxobject.get('extension');
+                next.push(App.ActiveChannel.create(call));
+            } else {
+                next.push(call);
+            }
+        });
+        if (field === 'callers') {
+            next.sort(function(a, b) { return (a.Position || 0) - (b.Position || 0); });
+        }
+        pbxobject.set(field, next);
+    }
+}
+
 //Redireccionar la página entera en caso de que la sesión se haya perdido
 function verificar_error_session(respuesta)
 {
@@ -109,12 +137,21 @@ $(document).ready(function() {
 		Application:		null,
 		AppData:			null,
 		
-		remoteExten: function() {
-			var r;
-			r = this.get('Extension');
-			if (r != null) return r;
-			return this.get('ConnectedLineNum');
-		}.property('Extension', 'ConnectedLineNum'),
+        localExtension: null,
+        remoteExten: function() {
+            // A dialplan destination can be this phone's own extension. Prefer
+            // the connected party, then a remote dialled number, then caller ID.
+            var local = this.get('localExtension');
+            var fields = ['ConnectedLineNum', 'Extension', 'CallerIDNum'];
+            for (var i = 0; i < fields.length; i++) {
+                var number = this.get(fields[i]);
+                if (number != null && number !== '' && number !== '<unknown>' &&
+                    number !== 'unknown' && (local == null || String(number) !== String(local))) {
+                    return number;
+                }
+            }
+            return null;
+        }.property('localExtension', 'Extension', 'ConnectedLineNum', 'CallerIDNum'),
 		formatSince: function() {
 			var since = this.get('Since');
 			//console.log(since);
@@ -150,6 +187,7 @@ $(document).ready(function() {
 		setActive: function(active) {
     //console.log(active);
     for (var i = 0; i < active.length; i++) {
+        active[i].localExtension = this.get('extension');
         active[i] = App.ActiveChannel.create(active[i]);
     }
     this.set('active', active);
@@ -158,13 +196,14 @@ $(document).ready(function() {
 		// Estado de la extensión o troncal: Up|Ringing|Down
 		trunkstate: function () {
 			var active = this.get('active');
+			var ringing = false;
 			for (var i = 0; i < active.length; i++) {
 				var st = active[i].get('ChannelStateDesc');
 				if (st == 'Up') return 'Up';
-				if (st == 'Ringing') return 'Ringing';
+				if (st == 'Ringing' || st == 'Ring') ringing = true;
 			}
-			return 'Down';
-		}.property('active'),
+			return ringing ? 'Ringing' : 'Down';
+		}.property('active', 'active.@each.ChannelStateDesc'),
 		
 		// Bandera que indica si hay nuevos mensajes
 		unreadMail: function() {
@@ -781,9 +820,10 @@ $(document).ready(function() {
 		conferences:		null,
 		parkinglots:		null,
 		longPoll:			null,	// Objeto de POST largo
-		evtSource:			null,	// Objeto EventSource, si está soportado por el navegador
 		estadoClienteHash: 	var_init['ESTADO_CLIENTE_HASH'],	// Hash del estado del cliente
 		connected:			false,
+		reconnectTimer: null,
+		stopping: false,
 
 		init: function() {
 			for (var k in var_init['ESTADO_PANELES']) {
@@ -822,70 +862,76 @@ $(document).ready(function() {
 			this.iptrunks = App.PBXPanelController.create(var_init['ESTADO_PANELES']['TrunksSIP']);
 			
 			setTimeout(this.pbxStatus.bind(this), 1);
+			$(window).unload(this.pbxStatus_shutdown.bind(this));
 			
 			// Esta variable puede usarse para localizar el resto de objetos en debug
 			debug_root = this;
 		},
 		
-		pbxStatus: function() {
-			var params = {
-					menu:		module_name, 
-					rawmode:	'yes',
-					clientstatehash: this.get('estadoClienteHash'),
-					action:		'pbxStatus'
-				};
+        pbxStatus: function() {
+            if (this.stopping || this.longPoll != null) return;
+            var started = Date.now();
+            var succeeded = false;
+            var request = $.ajax({
+                url: 'index.php',
+                data: {menu: module_name, rawmode: 'yes', action: 'pbxSnapshot'},
+                dataType: 'json',
+                cache: false,
+                timeout: 7000
+            });
+            this.longPoll = request;
+            request.done(function(response) {
+                if (this.stopping) return;
+                verificar_error_session(response);
+                if (response.error || !response.snapshot || !Array.isArray(response.pbxchanges)) {
+                    this.set('connected', false);
+                    return;
+                }
+                this.manejarRespuestaSnapshot(response);
+                succeeded = true;
+                this.set('connected', true);
+            }.bind(this));
+            request.fail(function() {
+                this.set('connected', false);
+            }.bind(this));
+            request.always(function() {
+                this.longPoll = null;
+                if (!this.stopping) {
+                    var delay = succeeded ? Math.max(0, 1000 - (Date.now() - started)) : 3000;
+                    this.reconnectTimer = setTimeout(this.pbxStatus.bind(this), delay);
+                }
+            }.bind(this));
+        },
 
-			if (window.EventSource) {
-				params['serverevents'] = true;
-				this.evtSource = new EventSource('index.php?' + $.param(params));
-				this.evtSource.onmessage = function(event) {
-					this.set('connected', true);
-					this.manejarRespuestaStatus($.parseJSON(event.data));
-				}.bind(this);
-				this.evtSource.onerror = function(event) {
-					this.set('connected', false);
-				}.bind(this);
-			} else {
-				this.longPoll = $.get('index.php', params,
-				function (respuesta) {
-					verificar_error_session(respuesta);
-					this.set('connected', true);
-					if (this.manejarRespuestaStatus(respuesta)) {
-						// Lanzar el método de inmediato
-						setTimeout(this.pbxStatus.bind(this), 1);
-					}
-				}.bind(this), 'json');
-			}
-			
-			// Apagar el SSE al cerrar la ventana
-			$(window).unload(this.pbxStatus_shutdown.bind(this));
-		},
-		
-		pbxStatus_shutdown: function () {
-			if (this.evtSource != null) {
-				this.evtSource.onmessage = function(event) {
-					//console.warn("This evtSource was closed but still receives messages!");
-				}
-				this.evtSource.onerror = null;
-				this.evtSource.close();
-				this.evtSource = null;
-			}
-			if (this.longPoll != null) {
-				this.longPoll.abort();
-				this.longPoll = null;
-			}
-			
-			$.post('index.php?menu=' + module_name + '&rawmode=yes', {
-				menu:		module_name, 
-				rawmode:	'yes',
-				action:		'pbxStatusShutdown'
-			},
-			function(respuesta) {
-				verificar_error_session(respuesta);
-				console.debug(respuesta);
-			}.bind(this), 'json');
-		},
-		
+        pbxStatus_shutdown: function() {
+            this.stopping = true;
+            clearTimeout(this.reconnectTimer);
+            if (this.longPoll != null) this.longPoll.abort();
+            this.longPoll = null;
+        },
+
+        manejarRespuestaSnapshot: function(response) {
+            var previous = this.snapshotIndex || Object.create(null);
+            var next = Object.create(null);
+            var changes = [];
+            response.pbxchanges.forEach(function(obj) {
+                var key = obj.objtype === 'phones' || obj.objtype === 'iptrunks' ? obj.channel :
+                    (obj.objtype === 'dahdi' ? obj.span : obj.extension);
+                var id = obj.objtype + ':' + key;
+                var signature = JSON.stringify(obj);
+                next[id] = {signature: signature, objtype: obj.objtype, key: key};
+                if (!previous[id] || previous[id].signature !== signature) {
+                    obj.changetype = previous[id] ? 'update' : 'create';
+                    changes.push(obj);
+                }
+            });
+            Object.keys(previous).forEach(function(id) {
+                if (!next[id]) changes.push({objtype: previous[id].objtype, key: previous[id].key, changetype: 'delete'});
+            });
+            this.manejarRespuestaStatus({timestamp: response.timestamp, pbxchanges: changes});
+            this.snapshotIndex = next;
+        },
+
 		localizarControladorExtension: function(key, value) {
 			var controller = null;
 			var objpos = null;
@@ -936,19 +982,21 @@ $(document).ready(function() {
 			}
 			this.set('estadoClienteHash', respuesta.estadoClienteHash);
 			
+			var initialQueues = [];
 			// Manejar cada objeto a medida que llega.
 			for (var i = 0; i < respuesta.pbxchanges.length; i++) {
 				//console.log(respuesta);
-				obj = respuesta.pbxchanges[i];
+				var obj = respuesta.pbxchanges[i];
 				switch (obj.changetype) {
 				case 'create':
-					refreshQueues();
+					if (obj.objtype === 'queues') initialQueues.push(obj);
 					if(obj.objtype === 'phones'){
 						contarPhones(obj);
 					}
 					this.insertPBXObject(obj);
 					break;
 				case 'update':
+                    if (obj.objtype === 'queues') initialQueues.push(obj);
 					this.updatePBXObject(obj);
 					break;
 				case 'delete':
@@ -960,6 +1008,10 @@ $(document).ready(function() {
 				}
 			}
 			
+			if (initialQueues.length) Ember.run.scheduleOnce('afterRender', null, function() {
+                renderInitialQueues(initialQueues);
+            });
+
 			// Indicar a todos los controladores que se terminó la carga
 			var controlkeys = ['extensions', 'area1', 'area2', 'area3', 'area4', 'area5', 'area6', 'area7', 'area8', 'area9','queues',
 			                   'conferences', 'parkinglots', 'dahdi', 'iptrunks'];
@@ -1004,6 +1056,7 @@ $(document).ready(function() {
 		insertPBXObject: function(obj) {
 		  var controller = this.locateTargetController(obj);
 		  if (controller != null) controller.addTypedObject(obj);
+          if (obj.objtype === 'queues') refreshAgents(obj.memberRefresh, obj.extension);
 		},
 		
 		updatePBXObject: function(obj) {
@@ -1047,8 +1100,14 @@ $(document).ready(function() {
 			}
 			if (pbxobject != null) {
 				for (var k in obj) switch (k) {	
+				case 'collectionChanges':
+					applyCallCollectionChanges(pbxobject, obj[k]);
+					break;
+				case 'memberRefresh':
+					refreshAgents(obj.memberRefresh, obj.extension);
+					pbxobject.set(k, obj[k]);
+					break;
 				case 'members':	// para colas
-					refreshAgents(obj.memberRefresh);
 					//pbxobject.setMembers(obj[k]);
 					break;
 				case 'active':	// para extensiones
@@ -1067,9 +1126,19 @@ $(document).ready(function() {
 			}
 		},
 		
-		deletePBXObject: function(obj) {
-			//
-		},
+        deletePBXObject: function(obj) {
+            if (obj.objtype === 'phones') {
+                var found = this.localizarControladorExtension('channel', obj.key);
+                if (found) { found[0].removeAt(found[1]); extensionCounts.totalExtensions--; }
+                return;
+            }
+            var controller = this.get(obj.objtype);
+            if (!controller) return;
+            var field = obj.objtype === 'iptrunks' ? 'channel' : (obj.objtype === 'dahdi' ? 'span' : 'extension');
+            var index = controller.findIndexBy(field, obj.key);
+            if (index != null) controller.removeAt(index);
+            if (obj.objtype === 'queues') delete queueMemberStates[obj.key];
+        },
 		
 		// Mandar a actualizar al servidor el tamaño del panel
 		updatePanelSize: function(sourcePanel, width, height) {
@@ -1599,6 +1668,30 @@ function buttonWarning(number) {
 let solicitudEnCurso = false;
 let ultimoTiempoSolicitud = 0;
 
+// The first AMI snapshot already includes members and queue statistics.
+// Render it directly instead of making a second QueueStatus request.
+function renderInitialQueues(queues) {
+    if (queues.some(function(queue) {
+        return !queue.memberRefresh || queue.Completed == null || queue.Abandoned == null;
+    })) {
+        refreshQueues(); // Compatibility with an older backend during rollout.
+        return;
+    }
+    actualizarUI(queues.map(function(queue) {
+        var members = queue.memberRefresh.map(function(member) {
+            var location = member.Interface || '';
+            return {
+                Name: member.MemberName,
+                Location: location.substring(location.indexOf('/') + 1).split('@')[0],
+                Status: member.Status,
+                Paused: member.Paused
+            };
+        });
+        members.sort(function(a, b) { return parseInt(a.Location, 10) - parseInt(b.Location, 10); });
+        return {Queue: String(queue.extension), Completed: queue.Completed, Abandoned: queue.Abandoned, Members: members};
+    }));
+}
+
 function refreshQueues() {
     if (solicitudEnCurso) {
         return; // Evitar solicitudes adicionales si una ya está en curso
@@ -1623,8 +1716,9 @@ function refreshQueues() {
             console.error('Error al obtener datos:', error);
             solicitudEnCurso = false;
         });
-  setInterval(refreshQueues, 300000);
 }
+
+// Queue statistics are included in every one-second snapshot.
 
 function actualizarUI(data) {
     // Recorre los datos y crea o actualiza los elementos correspondientes
@@ -1660,6 +1754,7 @@ function actualizarUI(data) {
 							html += '</div>';
               queueParameters.innerHTML = html;
             }
+            refreshAgents(queueMemberStates[queueNumber], queueNumber);
         }
     });
 }
@@ -1668,8 +1763,6 @@ function actualizarUI(data) {
 function generateAgentHTML(member) {
     var html = '';
     var status = memberStatus(member.Status, member.Paused);
-
-    console.log(member);
 
     html += '<div class="agent-container" data-member-number="'+ member.Location + '">';
     html += status.circleHTML; // Aquí utilizamos el HTML del círculo
@@ -1684,32 +1777,34 @@ function generateAgentHTML(member) {
     return html;
 }
 
-function refreshAgents(member) {
-  if (member) {
-    member.forEach(item => {
-      //const regex = /\/(.*?)@/;
-      //const match = item.Interface.match(regex);
-      const afterSlash = item.Interface.split('/')[1];
-      const result = afterSlash.includes('@') ? afterSlash.split('@')[0] : afterSlash;
+// Queue member states are queue-specific (including pause state). Reapply the
+// latest stream state after a slower statistics request rebuilds the agent DOM.
+var queueMemberStates = Object.create(null);
 
-      if (result) {
-        const memberNumber = result;
-        // Buscar todos los elementos div con el atributo data-member-number igual al valor extraído
-        const divsToUpdate = document.querySelectorAll('.agent-container[data-member-number="'+memberNumber+'"]');
-
-        divsToUpdate.forEach(divToUpdate => {
-          // Actualizar el contenido de cada div
-          var status = memberStatus(item.Status, item.Paused);
-          var html = status.circleHTML; // Aquí utilizamos el HTML del círculo
-          html += '<span class="agent-info">'+status.statusImage+''+memberNumber+' - '+ item.MemberName +'</span><br>';
-          divToUpdate.innerHTML = html;
+function refreshAgents(members, queue) {
+    if (!members || queue == null) return;
+    queueMemberStates[queue] = members;
+    var containers = document.querySelectorAll('[data-idattr]');
+    for (var i = 0; i < containers.length; i++) {
+        if (containers[i].getAttribute('data-idattr') !== 'QUEUE/' + queue) continue;
+        var agents = containers[i].querySelectorAll('.agent-container');
+        members.forEach(function(item) {
+            var location = item.Interface || item.Location || '';
+            var number = location.substring(location.indexOf('/') + 1).split('@')[0];
+            if (!number) return;
+            for (var j = 0; j < agents.length; j++) {
+                if (agents[j].getAttribute('data-member-number') !== number) continue;
+                var status = memberStatus(item.Status, item.Paused);
+                agents[j].innerHTML = status.circleHTML + '<span class="agent-info">' +
+                    status.statusImage + number + ' - ' + item.MemberName + '</span><br>';
+            }
         });
-      }
-    });
-  }
+    }
 }
 
 function memberStatus(status, paused) {
+    status = String(status);
+    paused = paused == null ? "0" : String(paused);
     if (paused !== "0" && status !== "5") {
         return {
             statusImage: "<i class='fa fa-pause' style='padding-right:4px; padding-left:1px; font-size:13px'></i>",

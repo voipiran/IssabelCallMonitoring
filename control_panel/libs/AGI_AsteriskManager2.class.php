@@ -12,6 +12,20 @@ class AGI_AsteriskManager2 extends AGI_AsteriskManager
     private $_listaEventos = array();   // Eventos pendientes por procesar
     private $_response = NULL;          // Respuesta recibida del último comando
     private $_debug = FALSE;
+    private $_batchResponses = array();
+    private $_deadline = NULL;
+
+    function setDeadline($deadline) { $this->_deadline = $deadline; }
+
+    function deadlineExpired()
+    {
+        if (!is_null($this->_deadline) && microtime(TRUE) >= $this->_deadline) {
+            if (is_resource($this->socket)) fclose($this->socket);
+            $this->socket = NULL;
+            return TRUE;
+        }
+        return FALSE;
+    }
 
     private function debug($s)
     {
@@ -27,12 +41,15 @@ class AGI_AsteriskManager2 extends AGI_AsteriskManager
         $listoEscribir = array();
         $listoErr = NULL;
 
-        if (is_null($this->socket)) return FALSE;
+        if ($this->deadlineExpired() || is_null($this->socket)) return FALSE;
         
         $listoLeer[] = $this->socket;
         if (strlen($this->_txbuffer) > 0) $listoEscribir[] = $this->socket;
         
-        $iNumCambio = @stream_select($listoLeer, $listoEscribir, $listoErr, $iMaxTimeout);
+        if (!is_null($this->_deadline)) $iMaxTimeout = min($iMaxTimeout, max(0, $this->_deadline - microtime(TRUE)));
+        $seconds = (int)$iMaxTimeout;
+        $microseconds = (int)(($iMaxTimeout - $seconds) * 1000000);
+        $iNumCambio = @stream_select($listoLeer, $listoEscribir, $listoErr, $seconds, $microseconds);
         if ($iNumCambio === false) {
             // Interrupción, tal vez una señal
             $this->log("INFO: select() finaliza con fallo - señal pendiente?");
@@ -88,7 +105,8 @@ class AGI_AsteriskManager2 extends AGI_AsteriskManager
     function disconnect($dontlogoff=NULL)
     {
         if (!$dontlogoff) $this->logoff();
-        if (!is_null($this->socket)) fclose($this->socket);
+        if (is_resource($this->socket)) fclose($this->socket);
+        $this->socket = NULL;
     }
 
 
@@ -113,6 +131,12 @@ class AGI_AsteriskManager2 extends AGI_AsteriskManager
                     $this->_listaEventos[] = $paquete;
                 }
             } elseif (isset($paquete['Response'])) {
+                // Batched read-only requests are correlated by ActionID. Events
+                // remain queued in their original order for normal dispatch.
+                if (isset($paquete['ActionID']) && array_key_exists($paquete['ActionID'], $this->_batchResponses)) {
+                    $this->_batchResponses[$paquete['ActionID']] = $paquete;
+                    continue;
+                }
                 if (!is_null($this->_response)) {
                     $this->log("ERR: segundo Response sobreescribe primer Response no procesado: ".
                         print_r($this->_response, 1));
@@ -241,10 +265,45 @@ class AGI_AsteriskManager2 extends AGI_AsteriskManager
         } else return NULL;
     }
 
+    // Limit in-flight requests so a large extension list does not flood AMI.
+    // Preserve MailboxCount semantics, including urgent messages and errors.
+    function MailboxCounts($mailboxes, $actionid)
+    {
+        $results = array();
+        $sequence = 0;
+        foreach (array_chunk(array_values(array_unique($mailboxes)), 32) as $batch) {
+            if (is_null($this->socket)) return FALSE;
+            $this->_batchResponses = array();
+            $ids = array();
+            foreach ($batch as $mailbox) {
+                $id = $actionid.'-mailbox-'.(++$sequence);
+                $ids[$id] = $mailbox;
+                $this->_batchResponses[$id] = NULL;
+                $this->_txbuffer .= "Action: MailboxCount\r\nActionID: $id\r\nMailbox: $mailbox\r\n\r\n";
+            }
+            $deadline = microtime(TRUE) + 10;
+            if (!is_null($this->_deadline)) $deadline = min($deadline, $this->_deadline);
+            while (in_array(NULL, $this->_batchResponses, TRUE)) {
+                $remaining = $deadline - microtime(TRUE);
+                if (is_null($this->socket) || $remaining <= 0) {
+                    // Do not reuse a connection with outstanding responses.
+                    if (!is_null($this->socket)) fclose($this->socket);
+                    $this->socket = NULL;
+                    $this->_batchResponses = array();
+                    return FALSE;
+                }
+                $this->procesarActividad(min(1, $remaining));
+            }
+            foreach ($ids as $id => $mailbox) $results[$mailbox] = $this->_batchResponses[$id];
+            $this->_batchResponses = array();
+        }
+        return $results;
+    }
+
     // Implementación de wait_response para compatibilidad con phpagi-asmanager
     function wait_response($allow_timeout = false, $return_on_event = false)
     {
-        while (!is_null($this->socket) && is_null($this->_response)) {
+        while (!$this->deadlineExpired() && !is_null($this->socket) && is_null($this->_response)) {
             if (!$this->procesarActividad()) {
                 usleep(100000);
             }
@@ -275,15 +334,18 @@ class AGI_AsteriskManager2 extends AGI_AsteriskManager
         // Iniciar la conexión
         $errno = $errstr = NULL;
         $sUrlConexion = "tcp://$server:$iPuerto";
-        $hConn = @stream_socket_client($sUrlConexion, $errno, $errstr);
+        $timeout = is_null($this->_deadline) ? 5 : max(0.001, $this->_deadline - microtime(TRUE));
+        $hConn = @stream_socket_client($sUrlConexion, $errno, $errstr, $timeout);
         if (!$hConn) {
             $this->log("ERR: no se puede conectar a puerto AMI en $sUrlConexion: ($errno) $errstr");
             return FALSE;
         }
         
         // Leer la cabecera de Asterisk
+        stream_set_timeout($hConn, (int)$timeout, (int)(($timeout - (int)$timeout) * 1000000));
         $str = fgets($hConn);
         if ($str == false) {
+            fclose($hConn);
             $this->log("ERR: No se ha recibido la cabecera de Asterisk Manager");
             return false;
         }
@@ -293,8 +355,8 @@ class AGI_AsteriskManager2 extends AGI_AsteriskManager
         $this->socket = $hConn;
 
         // Iniciar login con Asterisk
-        $res = $this->send_request('login', array('Username'=>$username, 'Secret'=>$secret));
-        if($res['Response'] != 'Success') {
+        $res = $this->send_request('login', array('Username'=>$username, 'Secret'=>$secret, 'Events'=>$events));
+        if(!isset($res['Response']) || $res['Response'] != 'Success') {
             $this->log("ERR: Fallo en login de AMI.");
             $this->disconnect();
             return false;
