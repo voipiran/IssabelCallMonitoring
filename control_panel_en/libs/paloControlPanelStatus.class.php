@@ -40,10 +40,16 @@ class paloControlPanelStatus extends paloInterfaceSSE
     private $_enumsInProgress = 0;
     private $_debug = FALSE;
     private $_bridges = array();
+    private $_collectionDeltas = FALSE;
+    private $_batchEvents = FALSE;
+    private $_snapshotOnly = FALSE;
+    private $_snapshotDeadline = NULL;
 
     // Constructor - abrir conexión a base de datos y a AMI    
-	function __construct()
+	function __construct($snapshotOnly = FALSE)
     {
+        $this->_snapshotOnly = $snapshotOnly;
+        $this->_snapshotDeadline = microtime(TRUE) + 5;
         global $arrConf;
         $this->_actionid = get_class($this).'-'.posix_getpid();
         
@@ -70,7 +76,8 @@ class paloControlPanelStatus extends paloInterfaceSSE
         }
         
         $this->_ami = new AGI_AsteriskManager2();
-        if (!$this->_ami->connect('localhost', 'admin', obtenerClaveAMIAdmin())) {
+        $this->_ami->setDeadline($this->_snapshotDeadline);
+        if (!$this->_ami->connect('localhost', 'admin', obtenerClaveAMIAdmin(), $snapshotOnly ? 'off' : 'on')) {
         	$this->_errMsg = _tr("Error when connecting to Asterisk Manager");
             $this->_ami = NULL;
             return;
@@ -80,6 +87,10 @@ class paloControlPanelStatus extends paloInterfaceSSE
         foreach (get_class_methods(get_class($this)) as $sMetodo) {
             $regs = NULL;
             if (preg_match('/^msg_(.+)$/', $sMetodo, $regs)) {
+                if ($snapshotOnly && !in_array($regs[1], array('EndpointList', 'EndpointListComplete',
+                    'PeerEntry', 'PeerlistComplete', 'Status', 'StatusComplete', 'QueueParams', 'QueueEntry',
+                    'QueueMember', 'QueueStatusComplete', 'MeetmeList', 'MeetmeListComplete', 'ParkedCall',
+                    'ParkedCallsComplete', 'DAHDIShowChannels', 'DAHDIShowChannelsComplete'))) continue;
                 if ($regs[1] != 'Default') {
                     $this->_ami->add_event_handler($regs[1], array($this, $sMetodo));
                 }
@@ -103,24 +114,57 @@ class paloControlPanelStatus extends paloInterfaceSSE
     
     function findInitialStateDifferences(&$initialClientState, &$jsonResponse)
     {
+        // Old cached clients continue to receive complete object updates.
+        $this->_collectionDeltas = !$this->_snapshotOnly && (getParameter('collectiondeltas') == '1');
     	foreach (array('phones', 'dahdi', 'iptrunks', 'conferences', 'parkinglots', 'queues') as $k)
             if (!isset($initialClientState[$k])) $initialClientState[$k] = array();
         if (!isset($initialClientState['dahdi']))
             $initialClientState['dahdi'] = array();
     
-        $this->_buildInternalState();
+        if (is_null($this->_ami) || !$this->_buildInternalState()) {
+            $jsonResponse['error'] = $this->_errMsg ? $this->_errMsg : 'Unable to load the current PBX state.';
+            return FALSE;
+        }
         $r = $this->findEventStateDifferences($initialClientState, $jsonResponse);
         return $r;    
     }
     
+    function snapshot()
+    {
+        $state = array();
+        $response = $this->createEmptyResponse();
+        $this->findInitialStateDifferences($state, $response);
+        $response['snapshot'] = TRUE;
+        $response['timestamp'] = time();
+        return $response;
+    }
+
+    function setupBeforeEventLoop()
+    {
+        $this->_batchEvents = TRUE;
+        $this->_ami->setDeadline(NULL);
+    }
+
     function waitForEvents()
     {
+        if (is_null($this->_ami) || is_null($this->_ami->socket)) return FALSE;
         if ($this->_ami->procesarPaquetes())
             $this->_ami->procesarActividad(0);
         else $this->_ami->procesarActividad(1);
+
+        // Coalesce bursts before comparing state, at most four updates/second.
+        // Initial enumeration must finish without delaying every AMI event.
+        if ($this->_batchEvents) {
+            $deadline = microtime(TRUE) + 0.25;
+            while (!is_null($this->_ami->socket) && microtime(TRUE) < $deadline) {
+                if (!$this->_ami->procesarPaquetes()) {
+                    $this->_ami->procesarActividad(max(0, $deadline - microtime(TRUE)));
+                }
+            }
+        }
         return !is_null($this->_ami->socket);
     }
-    
+
     function findEventStateDifferences(&$currentClientState, &$jsonResponse)
     {
         if (!$this->_bModified) return TRUE;
@@ -131,7 +175,27 @@ class paloControlPanelStatus extends paloInterfaceSSE
             foreach ($this->_internalState[$objtype] as $k => $v) {
                 if (!isset($currentClientState[$objtype][$k]) || $currentClientState[$objtype][$k] != $v) {
                 	$changetype = isset($currentClientState[$objtype][$k]) ? 'update' : 'create';
+                    $previous = isset($currentClientState[$objtype][$k]) ? $currentClientState[$objtype][$k] : array();
                     $currentClientState[$objtype][$k] = $v;
+                    // Moving a phone between panels requires a complete object.
+                    if ($this->_collectionDeltas && $changetype == 'update' &&
+                        (!isset($v['current_area']) || $v['current_area'] == $previous['current_area'])) {
+                        foreach (array('active', 'callers') as $field) {
+                            if (!isset($v[$field])) continue;
+                            $old = isset($previous[$field]) ? $previous[$field] : array();
+                            $delta = array('upsert' => array(), 'remove' => array());
+                            foreach ($v[$field] as $channel => $call) {
+                                if (!isset($old[$channel]) || $old[$channel] != $call)
+                                    $delta['upsert'][] = $call;
+                            }
+                            foreach ($old as $channel => $call) {
+                                if (!isset($v[$field][$channel])) $delta['remove'][] = $call['Channel'];
+                            }
+                            unset($v[$field]);
+                            if (count($delta['upsert']) || count($delta['remove']))
+                                $v['collectionChanges'][$field] = $delta;
+                        }
+                    }
                     $v['objtype'] = $objtype;
                     $v['changetype'] = $changetype;
                     if (isset($v['active'])) $v['active'] = array_values($v['active']);
@@ -195,10 +259,11 @@ class paloControlPanelStatus extends paloInterfaceSSE
 
     private function _buildInternalState()
     {
-    	$this->_loadStaticDataFromDatabase();
+        if (!$this->_loadStaticDataFromDatabase()) return FALSE;
         $this->_loadAreaAssignments();
-        $this->_updateStatusFromAsterisk();
+        if (!$this->_updateStatusFromAsterisk()) return FALSE;
         $this->_bModified = TRUE;
+        return TRUE;
     }
     
     /* Este procedimiento intenta cargar la información estática sobre los 
@@ -210,9 +275,6 @@ class paloControlPanelStatus extends paloInterfaceSSE
     private function _loadStaticDataFromDatabase()
     {
 
-    $pDB = new paloDB($arrConf['issabel_dsn']['acl']);
-    $pACL = new paloACL($pDB);
-    $user = $_SESSION['issabel_user'];
 
         // Recoger todas las extensiones, con todas las tecnologías
 		//VOIPIRAN
@@ -254,15 +316,26 @@ class paloControlPanelStatus extends paloInterfaceSSE
                 'active'           =>  array(),
             );
             
-            // Leer estado actual del voicemail
-            $r = $this->_ami->MailboxCount($phonestate['mailbox'], $this->_actionid);
-            if ($r['Response'] == 'Success') {
-            	foreach (array('UrgMessages', 'NewMessages', 'OldMessages') as $k)
-                    if (isset($r[$k])) $phonestate[$k] = (int)$r[$k];
-            }
             $this->_internalState['phones'][$tupla['channel']] = $phonestate;
         }
-        
+
+        // Fetch mailbox counts in bounded batches, not one network round trip
+        // per extension. AMI events received meanwhile stay queued.
+        $mailboxes = array();
+        foreach ($this->_internalState['phones'] as $phone) $mailboxes[] = $phone['mailbox'];
+        $counts = $this->_ami->MailboxCounts($mailboxes, $this->_actionid);
+        if ($counts === FALSE) {
+            $this->_errMsg = 'AMI connection lost or timed out while loading voicemail counts.';
+            return FALSE;
+        }
+        foreach ($this->_internalState['phones'] as $channel => $phone) {
+            $r = isset($counts[$phone['mailbox']]) ? $counts[$phone['mailbox']] : array();
+            if (isset($r['Response']) && $r['Response'] == 'Success') {
+                foreach (array('UrgMessages', 'NewMessages', 'OldMessages') as $k)
+                    if (isset($r[$k])) $this->_internalState['phones'][$channel][$k] = (int)$r[$k];
+            }
+        }
+
         // Leer y clasificar todas las colas conocidas
 		//VOIPIRAN
 /*
@@ -290,6 +363,9 @@ class paloControlPanelStatus extends paloInterfaceSSE
                 'extension'     =>  $tupla['extension'],
                 'description'   =>  $tupla['description'],
                 'members'       =>  array(),
+                'memberRefresh' =>  array(),
+                'Completed'     =>  0,
+                'Abandoned'     =>  0,
                 'callers'       =>  array(),
             );
         }
@@ -386,6 +462,7 @@ class paloControlPanelStatus extends paloInterfaceSSE
                 }
             }
         }
+        return TRUE;
     }
     
     private function _loadAreaAssignments()
@@ -418,38 +495,78 @@ class paloControlPanelStatus extends paloInterfaceSSE
     private function _updateStatusFromAsterisk()
     {
         $this->_enumsInProgress = 0;
+        $technologies = array();
+        foreach (array('phones', 'iptrunks') as $type)
+            foreach ($this->_internalState[$type] as $item)
+                if (isset($item['tech'])) $technologies[strtoupper($item['tech'])] = TRUE;
         // Actualiza información de extensions y troncales SIP
-        $r = $this->_ami->SIPPeers($this->_actionid);
-        if ($r['Response'] == 'Success') $this->_enumsInProgress++;
+        if (isset($technologies['SIP'])) {
+            $r = $this->_ami->SIPPeers($this->_actionid);
+            if (isset($r['Response']) && $r['Response'] == 'Success') $this->_enumsInProgress++;
+        }
         
         // Actualiza información de extensions y troncales PJSIP
-        $r = $this->_ami->PJSIPShowEndpoints($this->_actionid);
-        if ($r['Response'] == 'Success') $this->_enumsInProgress++;
+        if (isset($technologies['PJSIP'])) {
+            $r = $this->_ami->PJSIPShowEndpoints($this->_actionid);
+            if (isset($r['Response']) && $r['Response'] == 'Success') $this->_enumsInProgress++;
+        }
 
         // Actualiza información de extensions y troncales IAX2
-        $r = $this->_ami->IAXpeerlist($this->_actionid);
-        if ($r['Response'] == 'Success') $this->_enumsInProgress++;
+        if (isset($technologies['IAX2']) || isset($technologies['IAX'])) {
+            $r = $this->_ami->IAXpeerlist($this->_actionid);
+            if (isset($r['Response']) && $r['Response'] == 'Success') $this->_enumsInProgress++;
+        }
 
         // Obtener la información de todos los canales activos
-        $r = $this->_ami->Status(NULL, $this->_actionid);        
-        if ($r['Response'] == 'Success') $this->_enumsInProgress++;
+        $r = $this->_ami->Status(NULL, $this->_actionid);
+        if (!isset($r['Response']) || $r['Response'] != 'Success') {
+            $this->_errMsg = 'Unable to read the current channel snapshot from Asterisk.';
+            return FALSE;
+        }
+        $this->_enumsInProgress++;
 
         // Obtener la información de todas las colas activas
-        $r = $this->_ami->QueueStatus($this->_actionid);        
-        if ($r['Response'] == 'Success') $this->_enumsInProgress++;
+        $r = $this->_ami->QueueStatus($this->_actionid);
+        if (isset($r['Response']) && $r['Response'] == 'Success') {
+            $this->_enumsInProgress++;
+        } elseif (count($this->_internalState['queues'])) {
+            $this->_errMsg = 'Unable to read the current queue snapshot from Asterisk.';
+            return FALSE;
+        }
 
         // Obtener la información de todas las conferencias activas
-        $r = $this->_ami->MeetmeList(NULL, $this->_actionid);        
-        if ($r['Response'] == 'Success') $this->_enumsInProgress++;
+        if (count($this->_internalState['conferences'])) {
+            $r = $this->_ami->MeetmeList(NULL, $this->_actionid);
+            if (isset($r['Response']) && $r['Response'] == 'Success') $this->_enumsInProgress++;
+        }
  
         // Obtener la información de todas las llamadas parqueadas
-        $r = $this->_ami->ParkedCalls($this->_actionid);
-        if ($r['Response'] == 'Success') $this->_enumsInProgress++;
+        if (count($this->_internalState['parkinglots'])) {
+            $r = $this->_ami->ParkedCalls($this->_actionid);
+            if (isset($r['Response']) && $r['Response'] == 'Success') $this->_enumsInProgress++;
+        }
                 
         // Obtener la información de todos los canales DAHDI
-        $r = $this->_ami->DAHDIShowChannels(NULL, $this->_actionid);        
-        if ($r['Response'] == 'Success') $this->_enumsInProgress++;
-        while ($this->_enumsInProgress > 0) $this->waitForEvents();
+        if (count($this->_internalState['dahdi']['spans'])) {
+            $r = $this->_ami->DAHDIShowChannels(NULL, $this->_actionid);
+            if (isset($r['Response']) && $r['Response'] == 'Success') $this->_enumsInProgress++;
+        }
+        if (is_null($this->_ami->socket)) {
+            $this->_errMsg = 'AMI connection lost while requesting the PBX snapshot.';
+            return FALSE;
+        }
+        $deadline = is_null($this->_snapshotDeadline) ? microtime(TRUE) + 5 : $this->_snapshotDeadline;
+        while ($this->_enumsInProgress > 0) {
+            if (microtime(TRUE) >= $deadline) {
+                $this->_errMsg = 'PBX snapshot timed out before enumeration completed.';
+                return FALSE;
+            }
+            if (!$this->waitForEvents()) {
+                $this->_errMsg = 'AMI connection lost while loading the PBX snapshot.';
+                return FALSE;
+            }
+        }
+        return TRUE;
     }
     
     /**************************************************************************/
@@ -595,6 +712,8 @@ class paloControlPanelStatus extends paloInterfaceSSE
          */        
         if ($this->_enumsInProgress <= 0 || $params['ActionID'] != $this->_actionid) return;
 
+        if (!isset($params['Extension']) && isset($params['Exten'])) $params['Extension'] = $params['Exten'];
+
         // Calcular momento de inicio de la interacción del canal
         $params['Since'] = (isset($params['Seconds'])) ? time() - (int)$params['Seconds'] : NULL;
         if (is_null($params['Since'])) {
@@ -628,19 +747,8 @@ class paloControlPanelStatus extends paloInterfaceSSE
             $trunkinfo['active'][$params['Channel']] = $activeinfo;
         }
         
-        // Se verifica si la extensión indicada es una cola
-        if (isset($params['Extension']) && isset($this->_internalState['queues'][$params['Extension']])) {
-        	$this->_internalState['queues'][$params['Extension']]['callers'][$params['Channel']] = array(
-                'Channel'       =>  $params['Channel'],
-                'CallerIDNum'       =>  $this->_filterUnknown($params, 'CallerIDNum'),
-                'CallerIDName'      =>  $this->_filterUnknown($params, 'CallerIDName'),
-                'Since'         =>  $params['Since'],
-                
-                // Esta información se completa en msg_QueueEntry
-                'Position'      =>  NULL,
-                'QueueSince'    =>  NULL,
-            );
-        }
+        // Queue membership comes exclusively from QueueStatus/QueueEntry.
+        // A channel's dialplan extension does not prove it is still waiting.
     }
 
     private function & _identifyTrunk($channel)
@@ -691,6 +799,14 @@ class paloControlPanelStatus extends paloInterfaceSSE
         $this->_enumsInProgress--;
     }
 
+    function msg_QueueParams($sEvent, $params, $sServer, $iPort)
+    {
+        if ($this->_enumsInProgress <= 0 || !isset($params['ActionID']) ||
+            $params['ActionID'] != $this->_actionid || !isset($this->_internalState['queues'][$params['Queue']])) return;
+        foreach (array('Completed', 'Abandoned') as $field)
+            if (isset($params[$field])) $this->_internalState['queues'][$params['Queue']][$field] = (int)$params[$field];
+    }
+
     // Evento que contiene información sobre iteración de QueueStatus
     function msg_QueueMember($sEvent, $params, $sServer, $iPort)
     {
@@ -714,6 +830,7 @@ class paloControlPanelStatus extends paloInterfaceSSE
          */
         if (isset($this->_internalState['queues'][$params['Queue']])) {
             $this->_internalState['queues'][$params['Queue']]['members'][] = $params['Location'];
+            $this->msg_QueueMemberStatus($sEvent, $params, $sServer, $iPort);
         } 
     }
 
@@ -737,55 +854,40 @@ class paloControlPanelStatus extends paloInterfaceSSE
         Wait: 40
          */
         if (isset($this->_internalState['queues'][$params['Queue']])) {
-            if (isset($this->_internalState['queues'][$params['Queue']]['callers'][$params['Channel']])) {
-            	$c =& $this->_internalState['queues'][$params['Queue']]['callers'][$params['Channel']];
-                $c['Position'] = (int)$params['Position'];
-                $c['QueueSince'] = time() - (int)$params['Wait'];
-            }
+            // QueueEntry is a complete snapshot record, even if Status did not
+            // identify the channel (e.g. Local channels or a different Exten).
+            $this->msg_Join($sEvent, $params, $sServer, $iPort);
+            $c =& $this->_internalState['queues'][$params['Queue']]['callers'][$params['Channel']];
+            $c['QueueSince'] = time() - (int)$params['Wait'];
+            if (is_null($c['Since'])) $c['Since'] = $c['QueueSince'];
         } 
     }
 
     function msg_QueueMemberStatus($sEvent, $params, $sServer, $iPort)
     {
         $this->_dumpevent($sEvent, $params);
-
-        if (isset($this->_internalState['queues'][$params['Queue']])) {
-            $interface = $params['Interface'];
-            $existingIndex = null;
-
-
-            // Buscar si ya existe un elemento con la misma clave 'Interface'
-            foreach ($this->_internalState['queues'][$params['Queue']]['memberRefresh'] as $index => $member) {
-                if ($member['Interface'] === $interface) {
-                    $existingIndex = $index;
-                    break;
-                }
-            }
-
-            if ($existingIndex !== null) {
-                // Actualizar el elemento existente
-                $this->_internalState['queues'][$params['Queue']]['memberRefresh'][$existingIndex] = [
-                    'Interface' => $params['Interface'],
-                    'Status' => $params['Status'],
-                    'Paused' => $params['Paused'],
-                    'MemberName' => $params['MemberName']
-                ];
-            } else {
-                // Agregar un nuevo elemento si no existe
-                $this->_internalState['queues'][$params['Queue']]['memberRefresh'][] = [
-                    'Interface' => $params['Interface'],
-                    'Status' => $params['Status'],
-                    'Paused' => $params['Paused'],
-                    'MemberName' => $params['MemberName']
-                ];
-            }
-        /*
-        $fileLocation = '/var/www/html/modules/control_panel/' . 'JsonParams.json'; // Reemplaza 'archivo_nombre.json' con el nombre de archivo deseado en formato JSON
-        $jsonString = json_encode($params, JSON_PRETTY_PRINT) . "\n";
-        file_put_contents($fileLocation, $jsonString, FILE_APPEND);
-        */
-            $this->_bModified = TRUE;
+        if (!isset($this->_internalState['queues'][$params['Queue']])) return;
+        $interface = isset($params['Interface']) ? $params['Interface'] :
+            (isset($params['Location']) ? $params['Location'] : NULL);
+        if (is_null($interface)) return;
+        $members =& $this->_internalState['queues'][$params['Queue']]['memberRefresh'];
+        if (!is_array($members)) $members = array();
+        $index = count($members);
+        foreach ($members as $i => $member) {
+            if ($member['Interface'] === $interface) { $index = $i; break; }
         }
+        $member = isset($members[$index]) ? $members[$index] : array(
+            'Interface' => $interface, 'Status' => '0', 'Paused' => '0', 'MemberName' => $interface);
+        foreach (array('Status', 'Paused', 'MemberName') as $field)
+            if (isset($params[$field])) $member[$field] = $params[$field];
+        if (isset($params['Name']) && !isset($params['MemberName'])) $member['MemberName'] = $params['Name'];
+        $members[$index] = $member;
+        $this->_bModified = TRUE;
+    }
+
+    function msg_QueueMemberPause($sEvent, $params, $sServer, $iPort)
+    {
+        $this->msg_QueueMemberStatus($sEvent, $params, $sServer, $iPort);
     }
 
     // Evento que termina la enumeración de QueueStatus
@@ -1118,8 +1220,8 @@ UniqueID: 1380209988.23
             'CallerIDName'      =>  $this->_filterUnknown($params, 'CallerIDName'),
             'Since'             =>  time(),
             'BridgedChannel'    =>  NULL,
-            'ConnectedLineNum'  =>  NULL,
-            'ConnectedLineName' =>  NULL,
+            'ConnectedLineNum'  =>  $this->_filterUnknown($params, 'ConnectedLineNum'),
+            'ConnectedLineName' =>  $this->_filterUnknown($params, 'ConnectedLineName'),
             'ChannelStateDesc'  =>  $params['ChannelStateDesc'],
 
             // Para llenar esto se requiere de Newexten
@@ -1155,7 +1257,13 @@ newexten: => Array
  */
      	/* Para reducir las modificaciones al navegador, sólo se revisarán los
          * cambios que contienen una extensión numérica */
-        if (!preg_match('/^[[:digit:]#*]+$/', $params['Extension'])) return;
+        // Modern AMI uses Exten; older versions use Extension. Even a
+        // nonnumeric dialplan step may carry a new identity or answered state.
+        $this->msg_Newstate($sEvent, $params, $sServer, $iPort);
+        if (!isset($params['Extension']) && isset($params['Exten']))
+            $params['Extension'] = $params['Exten'];
+        if (!isset($params['Extension']) ||
+            !preg_match('/^[[:digit:]#*]+$/', $params['Extension'])) return;
          
         $trunkinfo =& $this->_identifyTrunk($params['Channel']);
         if (is_null($trunkinfo)) return;
@@ -1189,27 +1297,12 @@ newexten: => Array
     // NewCallerid anuncia que se tiene actualización de CallerID para el canal
     function msg_NewCallerid($sEvent, $params, $sServer, $iPort)
     {
-        $this->_dumpevent($sEvent, $params);
+        $this->msg_Newstate($sEvent, $params, $sServer, $iPort);
+    }
 
-/*
-    [Event] => NewCallerid
-    [Privilege] => call,all
-    [Channel] => IAX2/1099-4615
-    [CallerIDNum] => 1099
-    [CallerIDName] => 
-    [Uniqueid] => 1378845796.25
-    [CID-CallingPres] => 0 (Presentation Allowed, Not Screened)
-    [local_timestamp_received] => 1378845796.7249
- */
-        $trunkinfo =& $this->_identifyTrunk($params['Channel']);
-        if (is_null($trunkinfo)) return;
-        
-        if (isset($trunkinfo['active'][$params['Channel']])) {
-            $chaninfo =& $trunkinfo['active'][$params['Channel']];
-            foreach (array('CallerIDNum', 'CallerIDName') as $p)
-                if (isset($params[$p])) $chaninfo[$p] = $this->_filterUnknown($params, $p);
-            $this->_bModified = TRUE;
-    	}
+    function msg_NewConnectedLine($sEvent, $params, $sServer, $iPort)
+    {
+        $this->msg_Newstate($sEvent, $params, $sServer, $iPort);
     }
 
     // Cambio de estado del canal, puede que tenga Connected*
@@ -1242,20 +1335,52 @@ newexten: => Array
         }
     }
 
-    function msg_BridgeDestroy($sEvent, $params, $sServer, $iPort) {
-        unset($this->_bridges[$params['BridgeUniqueid']]);
+    function msg_BridgeDestroy($sEvent, $params, $sServer, $iPort)
+    {
+        $id = $params['BridgeUniqueid'];
+        if (isset($this->_bridges[$id])) {
+            foreach ($this->_bridges[$id] as $channel => $member)
+                $this->_setBridgedChannel($channel, NULL);
+            unset($this->_bridges[$id]);
+        }
     }
 
-    function msg_BridgeEnter($sEvent, $params, $sServer, $iPort) {
-        $numchannels = $params['BridgeNumChannels'];
-        $this->_bridges[$params['BridgeUniqueid']]['Channel'.$numchannels]=$params['Channel'];
-        $this->_bridges[$params['BridgeUniqueid']]['Uniqueid'.$numchannels]=$params['Uniqueid'];
-        $this->_bridges[$params['BridgeUniqueid']]['CallerID'.$numchannels]=$params['ConnectedLineNum'];
+    function msg_BridgeEnter($sEvent, $params, $sServer, $iPort)
+    {
+        // BridgeEnter carries the current channel state and connected identity.
+        // Do not infer "Up" merely from bridging (early media can be bridged).
+        $this->msg_Newstate($sEvent, $params, $sServer, $iPort);
+        $id = $params['BridgeUniqueid'];
+        $this->_bridges[$id][$params['Channel']] = $params;
+        $this->_refreshBridgeLinks($id);
+    }
 
-        if($numchannels == 2) {
-            $this->_bridges[$params['BridgeUniqueid']]['Event']='Bridge';
-            $this->_bridges[$params['BridgeUniqueid']]['Bridgesate']='Link';
-            $this->msg_Bridge('Bridge', $this->_bridges[$params['BridgeUniqueid']], $sServer, $iPort);
+    function msg_BridgeLeave($sEvent, $params, $sServer, $iPort)
+    {
+        $this->msg_Newstate($sEvent, $params, $sServer, $iPort);
+        $id = $params['BridgeUniqueid'];
+        if (!isset($this->_bridges[$id][$params['Channel']])) return;
+        unset($this->_bridges[$id][$params['Channel']]);
+        $this->_setBridgedChannel($params['Channel'], NULL);
+        $this->_refreshBridgeLinks($id);
+    }
+
+    private function _refreshBridgeLinks($id)
+    {
+        $channels = array_keys($this->_bridges[$id]);
+        foreach ($channels as $index => $channel) {
+            // Only a two-party bridge has an unambiguous remote channel.
+            $peer = count($channels) == 2 ? $channels[1 - $index] : NULL;
+            $this->_setBridgedChannel($channel, $peer);
+        }
+    }
+
+    private function _setBridgedChannel($channel, $peer)
+    {
+        $trunkinfo =& $this->_identifyTrunk($channel);
+        if (!is_null($trunkinfo) && isset($trunkinfo['active'][$channel])) {
+            $trunkinfo['active'][$channel]['BridgedChannel'] = $peer;
+            $this->_bModified = TRUE;
         }
     }
 
@@ -1285,7 +1410,9 @@ newexten: => Array
                     $chaninfo =& $trunkinfo['active'][$params[$ch1]];
                     if ($params['Bridgestate'] == 'Link') {
                         $chaninfo['BridgedChannel'] = $params[$ch2];
-                        $chaninfo['ConnectedLineNum'] = $params['CallerID1'];
+                        $peerID = 'CallerID'.(3 - $i);
+                        if (isset($params[$peerID]))
+                            $chaninfo['ConnectedLineNum'] = $this->_filterUnknown($params, $peerID);
                     } elseif ($params['Bridgestate'] == 'Unlink') {
                         $chaninfo['BridgedChannel'] = NULL;
                     }
@@ -1510,7 +1637,10 @@ peerstatus: => Array
     {
         $this->_dumpevent($sEvent, $params);
 
+        if (!isset($params['Location']) && isset($params['Interface'])) $params['Location'] = $params['Interface'];
+        if (!isset($params['Location'])) return;
         if (isset($this->_internalState['queues'][$params['Queue']])) {
+            $this->msg_QueueMemberStatus($sEvent, $params, $sServer, $iPort);
             if (!in_array($params['Location'], $this->_internalState['queues'][$params['Queue']]['members'])) {
             	$this->_internalState['queues'][$params['Queue']]['members'][] = $params['Location'];
                 $this->_bModified = TRUE;
@@ -1523,7 +1653,17 @@ peerstatus: => Array
     {
         $this->_dumpevent($sEvent, $params);
 
+        if (!isset($params['Location']) && isset($params['Interface'])) $params['Location'] = $params['Interface'];
+        if (!isset($params['Location'])) return;
         if (isset($this->_internalState['queues'][$params['Queue']])) {
+            $members =& $this->_internalState['queues'][$params['Queue']]['memberRefresh'];
+            foreach ($members as $index => $member) {
+                if ($member['Interface'] === $params['Location']) {
+                    array_splice($members, $index, 1);
+                    $this->_bModified = TRUE;
+                    break;
+                }
+            }
             $k = array_search($params['Location'], $this->_internalState['queues'][$params['Queue']]['members']);
             if ($k !== FALSE) {
             	array_splice($this->_internalState['queues'][$params['Queue']]['members'], $k, 1);
@@ -1728,9 +1868,9 @@ peerstatus: => Array
 */
     function shutdown()
     {
-    	$this->_ami->disconnect();
-        $this->_db->disconnect();
-        $this->_dbConfig->disconnect();
+        if (!is_null($this->_ami)) $this->_ami->disconnect(TRUE);
+        if (!is_null($this->_db)) $this->_db->disconnect();
+        if (!is_null($this->_dbConfig)) $this->_dbConfig->disconnect();
     }
 }
 ?>

@@ -154,6 +154,24 @@ $smarty->assign(array(
     return $c;
 }
 
+// A short request returning a fresh, complete snapshot. Authentication has
+// already run in Issabel; release its session lock before querying the PBX.
+function handleJSON_pbxSnapshot($smarty, $module_name, $local_templates_dir)
+{
+    session_write_close();
+    Header('Content-Type: application/json');
+    Header('Cache-Control: no-store');
+    require_once "modules/$module_name/libs/paloControlPanelStatus.class.php";
+    $panel = new paloControlPanelStatus(TRUE);
+    try {
+        $response = $panel->snapshot();
+    } finally {
+        $panel->shutdown();
+    }
+    $json = new Services_JSON();
+    return $json->encode($response);
+}
+
 function handleJSON_pbxStatus($smarty, $module_name, $local_templates_dir)
 {
     require_once "modules/$module_name/libs/paloControlPanelStatus.class.php";

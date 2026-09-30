@@ -72,7 +72,9 @@ class paloServerSentEvents
         $bSSE = (!is_null($sModoEventos) && $sModoEventos); 
         if ($bSSE) {
             Header('Content-Type: text/event-stream');
-            $this->_printflush("retry: 1\n");
+            Header('Cache-Control: no-cache');
+            Header('X-Accel-Buffering: no');
+            $this->_printflush("retry: 3000\n\n");
         } else {
             Header('Content-Type: application/json');
         }
@@ -86,12 +88,12 @@ class paloServerSentEvents
             return;
         }
 
-        $this->debug("Estado inicial: ".print_r($estadoCliente, 1));                
+        if ($this->_debug) $this->debug("Estado inicial: ".print_r($estadoCliente, 1));
         $jsonResponse = $this->_implementation->createEmptyResponse();
         $bKeepListening = $this->_implementation->findInitialStateDifferences($estadoCliente, $jsonResponse);
         if (!$bKeepListening) {
-            $this->debug("Estado inicial aborta la escucha: ".print_r($estadoCliente, 1));
-            $this->debug("Respuesta inicial aborta la escucha: ".print_r($jsonResponse, 1));
+            if ($this->_debug) $this->debug("Estado inicial aborta la escucha: ".print_r($estadoCliente, 1));
+            if ($this->_debug) $this->debug("Respuesta inicial aborta la escucha: ".print_r($jsonResponse, 1));
             $jsonResponse['estadoClienteHash'] = self::generarEstadoHash($this->_module_name, $estadoCliente);
             $this->_jsonflush($bSSE, $jsonResponse);
         } else {
@@ -102,9 +104,10 @@ class paloServerSentEvents
     
                 // Se inicia espera larga con el navegador...
                 $iTimestampInicio = time();
-                $this->debug("Respuesta antes de while: ".print_r($jsonResponse, 1));                
-                $this->debug("Estado antes de while: ".print_r($estadoCliente, 1));                
+                if ($this->_debug) $this->debug("Respuesta antes de while: ".print_r($jsonResponse, 1));
+                if ($this->_debug) $this->debug("Estado antes de while: ".print_r($estadoCliente, 1));
                 while (connection_status() == CONNECTION_NORMAL 
+                    && $bKeepListening
                     && $this->_implementation->isEmptyResponse($jsonResponse) 
                     && time() - $iTimestampInicio <  $iTimeoutPoll) {
     
@@ -119,7 +122,7 @@ class paloServerSentEvents
                     
                     if (isset($_SESSION[$this->_module_name]) 
                         && $this->_implementation->checkInvalidatedWait($estadoCliente, $_SESSION[$this->_module_name]['estadoCliente'])) {
-                        $this->debug("Estado invalidado\n");
+                        if ($this->_debug) $this->debug("Estado invalidado\n");
                         $jsonResponse['estadoClienteHash'] = 'invalidated';
                         if ($bSSE) $this->_printflush("retry: 5000\n");
                         $this->_jsonflush($bSSE, $jsonResponse);
@@ -130,7 +133,7 @@ class paloServerSentEvents
                     if (isset($_SESSION[$this->_module_name]) && 
                         isset($_SESSION[$this->_module_name]['finalizarEscucha']) && 
                         $_SESSION[$this->_module_name]['finalizarEscucha']) {
-                        $this->debug("Petición de finalización\n");
+                        if ($this->_debug) $this->debug("Petición de finalización\n");
                         $jsonResponse['estadoClienteHash'] = 'shutdown';
                         if ($bSSE) $this->_printflush("retry: 5000\n");
                         $this->_jsonflush($bSSE, $jsonResponse);
@@ -139,8 +142,8 @@ class paloServerSentEvents
                     }
                     
                     $bKeepListening = $this->_implementation->findEventStateDifferences($estadoCliente, $jsonResponse);
-                    $this->debug("Diferencias encontradas ($bKeepListening): ".print_r($jsonResponse, 1));
-                    $this->debug("Estado modificado: ".print_r($estadoCliente, 0));                
+                    if ($this->_debug) $this->debug("Diferencias encontradas ($bKeepListening): ".print_r($jsonResponse, 1));
+                    if ($this->_debug) $this->debug("Estado modificado: ".print_r($estadoCliente, TRUE));
                 }
     
                 $jsonResponse['estadoClienteHash'] = self::generarEstadoHash($this->_module_name, $estadoCliente);
@@ -155,7 +158,7 @@ class paloServerSentEvents
     
     private function _suggestEventTimeout()
     {
-        $iTimeoutPoll = 2 * 60;
+        $iTimeoutPoll = 15; // Heartbeat also detects disconnected browsers.
 /*
         // Problemas con MSIE al haber más de un AJAX con respuesta larga
         if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE ') !== false) {
@@ -178,7 +181,7 @@ class paloServerSentEvents
     {
         print $s;
         $this->debug($s);
-        ob_flush();
+        if (ob_get_level() > 0) ob_flush();
         flush();
     }
     
